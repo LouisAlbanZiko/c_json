@@ -1,5 +1,15 @@
 #include "internal.h"
 
+C_JSON_Variable *c_json_variable_create(uint8_t type, uint8_t value)
+{
+	C_JSON_Variable *var = malloc(sizeof(*var));
+	var->type = type;
+	var->value = value;
+	return var;
+}
+
+void c_json_variable_destroy(C_JSON_Variable *variable);
+
 void c_json_variable_copy(C_JSON_Variable *dst, C_JSON_Variable *src)
 {
 	switch(src->type)

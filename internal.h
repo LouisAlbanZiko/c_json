@@ -47,26 +47,60 @@ void c_json_string_buffer_destroy(JSON_StringBuffer *buffer);
 
 /* --- --- */
 
-/* --- object --- */
+/* --- C_JSON_Variable --- */
 
-typedef struct _JSON_Object_Element
+typedef struct _C_JSON_Variable
 {
-	const char *name;
 	uint8_t type;
 	uint8_t _packing_bytes[7];
 	uint64_t value;
-} JSON_Object_Element;
+} C_JSON_Variable;
 
-#define C_JSON_INDEX_COUNT_C -1
-#define C_JSON_INDEX_COUNT_M -2
-#define C_JSON_INDEX_STRING_BUFFER -4
-#define C_JSON_INDEX_HASH_FUNCTION -5
+typedef enum _C_JSON_Type
+{
+	C_JSON_TYPE_NONE = 0,
+	C_JSON_TYPE_STRING,
+	C_JSON_TYPE_INT,
+	C_JSON_TYPE_FLOAT,
+	C_JSON_TYPE_BOOL,
+	C_JSON_TYPE_NULL,
+	C_JSON_TYPE_OBJECT,
+	C_JSON_TYPE_ARRAY,
+	C_JSON_TYPE_COUNT
+} C_JSON_Type;
+
+/* --- object --- */
+
+typedef uint64_t (*c_json_hash_function)(const char *);
+
+typedef struct _C_JSON_Object_Element
+{
+	const char *name;
+	C_JSON_Variable *variable;
+} C_JSON_Object_Element;
+
+typedef struct _C_JSON_Object
+{
+	c_json_hash_function hash_function;
+	JSON_StringBuffer buffer;
+	uint64_t count_m;
+	uint64_t count_c;
+	C_JSON_Object_Element elements[];
+} C_JSON_Object;
 
 uint64_t _c_json_hash_default(const char *string);
 
 /* --- array --- */
 
-typedef C_JSON_Variable JSON_Array_Element;
+typedef C_JSON_Variable C_JSON_Array_Element;
+
+typedef struct _C_JSON_Array
+{
+	JSON_StringBuffer buffer;
+	uint64_t count_m;
+	uint64_t count_c;
+	C_JSON_Array_Element elements[];
+} C_JSON_Array;
 
 /* --- parse --- */
 
@@ -95,9 +129,12 @@ const char *_c_json_json_type_string(uint8_t type);
 
 typedef struct _JSON_GlobalData
 {
+	const char *json_type_strings[C_JSON_TYPE_COUNT + 1];
+	uint64_t default_object_length;
+	uint64_t default_array_length;
+	uint64_t default_string_buffer_length;
 	c_json_error_callback error_callback;
 	char error_message[1024];
-	const char *json_type_strings[C_JSON_TYPE_COUNT + 1];
 } JSON_GlobalData;
 
 extern JSON_GlobalData *g_c_json_data;

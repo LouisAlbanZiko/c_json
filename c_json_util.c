@@ -2,12 +2,15 @@
 
 JSON_GlobalData *g_c_json_data = NULL;
 
-void c_json_init()
+void _c_json_init(uint64_t default_object_length, uint64_t default_array_length, uint64_t default_string_buffer_length)
 {
 	if (g_c_json_data == NULL)
 	{
 		g_c_json_data = malloc(sizeof(*g_c_json_data));
 		g_c_json_data->error_callback = NULL;
+		g_c_json_data->default_object_length = default_object_length;
+		g_c_json_data->default_array_length = default_array_length;
+		g_c_json_data->default_string_buffer_length = default_string_buffer_length;
 		g_c_json_data->json_type_strings[C_JSON_TYPE_NONE] = "C_JSON_TYPE_NONE";
 		g_c_json_data->json_type_strings[C_JSON_TYPE_STRING] = "C_JSON_TYPE_STRING";
 		g_c_json_data->json_type_strings[C_JSON_TYPE_INT] = "C_JSON_TYPE_INT";
@@ -17,7 +20,6 @@ void c_json_init()
 		g_c_json_data->json_type_strings[C_JSON_TYPE_OBJECT] = "C_JSON_TYPE_OBJECT";
 		g_c_json_data->json_type_strings[C_JSON_TYPE_ARRAY] = "C_JSON_TYPE_ARRAY";
 		g_c_json_data->json_type_strings[C_JSON_TYPE_COUNT] = "C_JSON_TYPE_UNKNOWN";
-
 	}
 }
 
