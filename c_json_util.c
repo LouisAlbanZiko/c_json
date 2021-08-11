@@ -70,7 +70,7 @@ const char *_c_json_json_type_string(uint8_t type)
 
 void c_json_string_buffer_create(JSON_StringBuffer *buffer_dst, uint32_t initial_size)
 {
-	initial_size = (initial_size == C_JSON_DEFAULT) * C_JSON_DEFAULT_STRING_BUFFER_LENGTH + initial_size;
+	initial_size = (initial_size == C_JSON_DEFAULT) * g_c_json_data->default_string_buffer_length + initial_size;
 	buffer_dst->size_c = 0;
 	buffer_dst->size_m = initial_size;
 	buffer_dst->data = malloc(sizeof(*buffer_dst->data) * initial_size);

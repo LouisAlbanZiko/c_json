@@ -39,12 +39,14 @@ void c_json_null_destroy(C_JSON_Variable *null);
 
 C_JSON_Variable *c_json_object_create(uint64_t initial_length);
 C_JSON_Variable *c_json_object_copy(C_JSON_Variable *object);
+void c_json_object_destroy(C_JSON_Variable *object);
+C_JSON_Variable *c_json_object_get(C_JSON_Variable *object, const char *name);
+void c_json_object_set(C_JSON_Variable *object, const char *name, C_JSON_Variable *variable);
 void c_json_object_resize(C_JSON_Variable *object, uint64_t new_length);
 void c_json_object_attach(C_JSON_Variable *object, const char *name, C_JSON_Variable *variable);
 void c_json_object_push(C_JSON_Variable *object, const char *name, C_JSON_Variable *variable);
 C_JSON_Variable *c_json_object_detach(C_JSON_Variable *object, const char *name);
 void c_json_object_remove(C_JSON_Variable *object, const char *name);
-void c_json_object_destroy(C_JSON_Variable *object);
 
 C_JSON_Variable *c_json_array_create(uint64_t initial_length);
 C_JSON_Variable *c_json_array_copy(C_JSON_Variable *array);
@@ -74,6 +76,7 @@ typedef enum _C_JSON_Error
 {
 	C_JSON_ERROR_INCORRECT_TYPE = 1,
 	C_JSON_ERROR_OUT_OF_BOUNDS,
+	C_JSON_ERROR_VARIABLE_NOT_FOUND,
 	C_JSON_ERROR_NEW_SIZE_TOO_SMALL
 } C_JSON_Error;
 

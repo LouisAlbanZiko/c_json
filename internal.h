@@ -51,8 +51,8 @@ void c_json_string_buffer_destroy(JSON_StringBuffer *buffer);
 
 typedef struct _C_JSON_Variable
 {
-	uint8_t type;
 	uint8_t _packing_bytes[7];
+	uint8_t type;
 	uint64_t value;
 } C_JSON_Variable;
 
@@ -81,12 +81,16 @@ typedef struct _C_JSON_Object_Element
 
 typedef struct _C_JSON_Object
 {
+	uint8_t _packing_bytes[7];
+	uint8_t type;
 	c_json_hash_function hash_function;
 	JSON_StringBuffer buffer;
-	uint64_t count_m;
-	uint64_t count_c;
+	uint32_t count_c;
+	uint32_t count_m;
 	C_JSON_Object_Element elements[];
 } C_JSON_Object;
+
+uint64_t _c_json_object_find(C_JSON_Object *object, const char *name);
 
 uint64_t _c_json_hash_default(const char *string);
 
