@@ -81,8 +81,6 @@ typedef struct _C_JSON_Object_Element
 
 typedef struct _C_JSON_Object
 {
-	uint8_t _packing_bytes[7];
-	uint8_t type;
 	c_json_hash_function hash_function;
 	JSON_StringBuffer buffer;
 	uint32_t count_c;
@@ -90,13 +88,17 @@ typedef struct _C_JSON_Object
 	C_JSON_Object_Element elements[];
 } C_JSON_Object;
 
-uint64_t _c_json_object_find(C_JSON_Object *object, const char *name);
+void _c_json_object_resize(C_JSON_Variable *object, uint64_t new_length);
+uint64_t _c_json_object_find(C_JSON_Variable *object, const char *name);
 
 uint64_t _c_json_hash_default(const char *string);
 
 /* --- array --- */
 
-typedef C_JSON_Variable C_JSON_Array_Element;
+typedef struct _C_JSON_Array_Element
+{
+	C_JSON_Variable *variable;
+} C_JSON_Array_Element;
 
 typedef struct _C_JSON_Array
 {

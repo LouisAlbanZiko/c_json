@@ -58,7 +58,7 @@ void c_json_object_resize(C_JSON_Variable *object, uint64_t new_length)
 			_c_json_make_error(C_JSON_ERROR_SEVERITY_ERROR, C_JSON_ERROR_NEW_SIZE_TOO_SMALL, "The new size of the object is too small. Current used size: %d. New size: %d.", object_ptr->count_c, new_length);
 		}
 		uint64_t length = object_ptr->count_m;
-		
+
 		C_JSON_Object *new_object_ptr = malloc(sizeof(*object_ptr) + new_length * sizeof(C_JSON_Object_Element));
 		object->value = (uint64_t)new_object_ptr;
 		new_object_ptr->count_c = 0;
@@ -160,12 +160,12 @@ void c_json_object_remove(C_JSON_Variable *obj, const char *name)
 
 C_JSON_Variable c_json_object_detach(C_JSON_Variable *obj, const char *name)
 {
-	if(obj->type == C_JSON_TYPE_OBJECT)
+	if (obj->type == C_JSON_TYPE_OBJECT)
 	{
 		C_JSON_Object *object_ptr = (C_JSON_Object *)(obj->value);
 		c_json_hash_function hash_function = (c_json_hash_function)(object_ptr->hash_function);
 		uint64_t hash = hash_function(name);
-		
+
 		C_JSON_Object_Element *object_list = (C_JSON_Object_Element *)object_ptr->elements;
 
 		while (object_list[hash].name != NULL)
@@ -208,6 +208,37 @@ void c_json_object_destroy(C_JSON_Variable *value)
 	else
 	{
 		_c_json_make_error(C_JSON_ERROR_SEVERITY_ERROR, C_JSON_ERROR_INCORRECT_TYPE, "Incorrect type. Expected %s but received %s.", g_c_json_data->json_type_strings[C_JSON_TYPE_OBJECT], g_c_json_data->json_type_strings[value->type]);
+	}
+}
+
+void _c_json_object_resize(C_JSON_Variable *object, uint64_t new_length)
+{
+}
+
+uint64_t _c_json_object_find(C_JSON_Variable *variable, const char *name)
+{
+	if (variable->type == C_JSON_TYPE_OBJECT)
+	{
+		C_JSON_Object *object = (C_JSON_Object *)variable->value;
+
+		uint64_t hash = object->hash_function(name) % object->count_m;
+		uint64_t hash_start = hash;
+		do
+		{
+			if (object->elements[hash].name != NULL)
+			{
+				if (strcmp(name, object->elements[hash].name) == 0)
+				{
+					return hash;
+				}
+			}
+		} while (hash != hash_start);
+		return object->count_m;
+	}
+	else
+	{
+		
+		return UINT64_MAX;
 	}
 }
 

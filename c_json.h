@@ -42,7 +42,6 @@ C_JSON_Variable *c_json_object_copy(C_JSON_Variable *object);
 void c_json_object_destroy(C_JSON_Variable *object);
 C_JSON_Variable *c_json_object_get(C_JSON_Variable *object, const char *name);
 void c_json_object_set(C_JSON_Variable *object, const char *name, C_JSON_Variable *variable);
-void c_json_object_resize(C_JSON_Variable *object, uint64_t new_length);
 void c_json_object_attach(C_JSON_Variable *object, const char *name, C_JSON_Variable *variable);
 void c_json_object_push(C_JSON_Variable *object, const char *name, C_JSON_Variable *variable);
 C_JSON_Variable *c_json_object_detach(C_JSON_Variable *object, const char *name);
