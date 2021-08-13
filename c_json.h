@@ -1,96 +1,89 @@
-#ifndef _c_json_H_
-#define _c_json_H_
+#ifndef _C_JSON_H_
+#define _C_JSON_H_
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include <stdio.h>
+#include <math.h>
 
-/* --- init --- */
-void _c_json_init(
-	uint64_t default_object_length,
-	uint64_t default_array_length,
-	uint64_t default_string_buffer_length
-);
-#define c_json_init() _c_json_init(C_JSON_DEFAULT_OBJECT_LENGTH, C_JSON_DEFAULT_ARRAY_LENGTH, C_JSON_DEFAULT_STRING_BUFFER_LENGTH)
-void c_json_terminate();
-
-/* --- C_JSON_Variable --- */
-typedef struct _C_JSON_Variable C_JSON_Variable;
-
-C_JSON_Variable *c_json_string_create(const char *value);
-C_JSON_Variable *c_json_string_copy(C_JSON_Variable *string);
-void c_json_string_destroy(C_JSON_Variable *string);
-
-C_JSON_Variable *c_json_integer_create(int64_t value);
-C_JSON_Variable *c_json_integer_copy(C_JSON_Variable *integer);
-void c_json_integer_destroy(C_JSON_Variable *integer);
-
-C_JSON_Variable *c_json_float_create(double value);
-C_JSON_Variable *c_json_float_copy(C_JSON_Variable *float_var);
-void c_json_float_destroy(C_JSON_Variable *float_var);
-
-C_JSON_Variable *c_json_bool_create(uint64_t value);
-C_JSON_Variable *c_json_bool_copy(C_JSON_Variable *boolean);
-void c_json_bool_destroy(C_JSON_Variable *boolean);
-
-C_JSON_Variable *c_json_null_create();
-C_JSON_Variable *c_json_null_copy(C_JSON_Variable *null);
-void c_json_null_destroy(C_JSON_Variable *null);
-
-C_JSON_Variable *c_json_object_create(uint64_t initial_length);
-C_JSON_Variable *c_json_object_copy(C_JSON_Variable *object);
-void c_json_object_destroy(C_JSON_Variable *object);
-C_JSON_Variable *c_json_object_get(C_JSON_Variable *object, const char *name);
-void c_json_object_set(C_JSON_Variable *object, const char *name, C_JSON_Variable *variable);
-void c_json_object_attach(C_JSON_Variable *object, const char *name, C_JSON_Variable *variable);
-void c_json_object_push(C_JSON_Variable *object, const char *name, C_JSON_Variable *variable);
-C_JSON_Variable *c_json_object_detach(C_JSON_Variable *object, const char *name);
-void c_json_object_remove(C_JSON_Variable *object, const char *name);
-
-C_JSON_Variable *c_json_array_create(uint64_t initial_length);
-C_JSON_Variable *c_json_array_copy(C_JSON_Variable *array);
-void c_json_array_attach(C_JSON_Variable *object, C_JSON_Variable *variable);
-void c_json_array_push(C_JSON_Variable *object, C_JSON_Variable *variable);
-void c_json_array_destroy(C_JSON_Variable *array);
-
-C_JSON_Variable *c_json_variable_copy(C_JSON_Variable *variable);
-void c_json_variable_destroy(C_JSON_Variable *variable);
-
-#define C_JSON_DEFAULT 0
-
-/* --- error --- */
-typedef void (*c_json_error_callback)(uint32_t severity, uint32_t type, const char *message);
-void c_json_set_error_callback(c_json_error_callback error_callback);
-
-typedef enum _C_JSON_ErrorSeverity
+enum CJ_Variable_Type
 {
-	C_JSON_ERROR_SEVERITY_FATAL = 0,
-	C_JSON_ERROR_SEVERITY_ERROR,
-	C_JSON_ERROR_SEVERITY_WARN,
-	C_JSON_ERROR_SEVERITY_INFO,
-	C_JSON_ERROR_SEVERITY_TRACE
-} C_JSON_ErrorSeverity;
+	CJ_TYPE_NULL = 0,
+	CJ_TYPE_INT,
+	CJ_TYPE_FLOAT,
+	CJ_TYPE_BOOL,
+	CJ_TYPE_STRING,
+	CJ_TYPE_OBJECT,
+	CJ_TYPE_ARRAY,
+	CJ_TYPE_COUNT
+};
 
-typedef enum _C_JSON_Error
-{
-	C_JSON_ERROR_INCORRECT_TYPE = 1,
-	C_JSON_ERROR_OUT_OF_BOUNDS,
-	C_JSON_ERROR_VARIABLE_NOT_FOUND,
-	C_JSON_ERROR_NEW_SIZE_TOO_SMALL
-} C_JSON_Error;
+// variable
+typedef struct _CJ_Variable CJ_Variable;
 
-/* --- external_defines --- */
+CJ_Variable *cj_variable_copy(CJ_Variable *variable);
+void cj_variable_set(CJ_Variable *variable, uint64_t type, uint64_t value);
+uint64_t cj_variable_type(CJ_Variable *variable);
+uint64_t cj_variable_value(CJ_Variable *variable);
+void cj_variable_destroy(CJ_Variable *variable);
 
-#ifndef C_JSON_DEFAULT_OBJECT_LENGTH
-	#define C_JSON_DEFAULT_OBJECT_LENGTH 8
-#endif
+// integer
+typedef struct _CJ_Integer CJ_Integer;
 
-#ifndef C_JSON_DEFAULT_ARRAY_LENGTH
-	#define C_JSON_DEFAULT_ARRAY_LENGTH 8
-#endif
+CJ_Integer *cj_integer_create(int64_t value);
+CJ_Integer *cj_integer_copy(CJ_Integer *integer);
+void cj_integer_destroy(CJ_Integer *integer);
 
-#ifndef C_JSON_DEFAULT_STRING_BUFFER_LENGTH
-	#define C_JSON_DEFAULT_STRING_BUFFER_LENGTH 64
-#endif
+void cj_integer_set(CJ_Integer *integer, int64_t value);
+int64_t cj_integer_get(CJ_Integer *integer);
+
+// float
+typedef struct _CJ_Float CJ_Float;
+
+CJ_Float *cj_float_create(double value);
+CJ_Float *cj_float_copy(CJ_Float *_float);
+void cj_float_destroy(CJ_Float *_float);
+
+void cj_float_set(CJ_Float *_float, double value);
+double cj_float_get(CJ_Float *_float);
+
+// bool
+typedef struct _CJ_Bool CJ_Bool;
+
+CJ_Bool *cj_bool_create(uint64_t value);
+CJ_Bool *cj_bool_copy(CJ_Bool *bool);
+void cj_bool_destroy(CJ_Bool *bool);
+
+void cj_bool_set(CJ_Bool *bool, uint64_t value);
+uint64_t cj_bool_get(CJ_Bool *bool);
+
+// string
+typedef struct _CJ_String CJ_String;
+
+CJ_String *cj_string_create(const char *value);
+CJ_String *cj_string_copy(CJ_String *string);
+void cj_string_destroy(CJ_String *string);
+
+void cj_string_set(CJ_String *string, const char *value);
+const char *cj_string_get(CJ_String *string);
+
+// object
+typedef struct _CJ_Object CJ_Object;
+
+CJ_Object *cj_object_create();
+void cj_object_destroy(CJ_Object *object);
+void cj_object_attach(CJ_Object *object, const char *name, CJ_Variable *variable);
+CJ_Variable *cj_object_detach(CJ_Object *object, const char *name);
+CJ_Variable *cj_object_get(CJ_Object *object, const char *name);
+
+// array
+typedef struct _CJ_Array CJ_Array;
+
+CJ_Array *cj_array_create();
+void cj_array_destroy(CJ_Array *array);
+void cj_array_attach(CJ_Array *array, uint64_t index, CJ_Variable *variable);
+CJ_Variable *cj_array_detach(CJ_Array *array, uint64_t index);
+CJ_Variable *cj_array_get(CJ_Array *array, uint64_t index);
 
 #endif
