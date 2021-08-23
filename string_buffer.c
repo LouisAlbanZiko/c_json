@@ -7,7 +7,7 @@ void cj_string_buffer_create(CJ_String_Buffer *buffer)
 	buffer->data = malloc(sizeof(*buffer->data) * buffer->count_m);
 }
 
-void cj_string_buffer_insert(CJ_String_Buffer *buffer, const char *string)
+void cj_string_buffer_insert_string(CJ_String_Buffer *buffer, const char *string)
 {
 	uint32_t length = strlen(string);
 	if(buffer->count_c + length + 1 > buffer->count_m)
@@ -17,6 +17,16 @@ void cj_string_buffer_insert(CJ_String_Buffer *buffer, const char *string)
 	}
 	strcpy(buffer->data + buffer->count_c, string);
 	buffer->count_c += length + 1;
+}
+
+void cj_string_buffer_insert_char(CJ_String_Buffer *buffer, char c)
+{
+	if(buffer->count_c + 1 > buffer->count_m)
+	{
+		buffer->count_m *= 2;
+		buffer->data = realloc(buffer->data, sizeof(*buffer->data) * buffer->count_m);
+	}
+	buffer->data[buffer->count_c++] = c;
 }
 
 char *cj_string_buffer_current(CJ_String_Buffer *buffer)

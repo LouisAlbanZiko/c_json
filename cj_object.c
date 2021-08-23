@@ -28,11 +28,38 @@ CJ_Object *cj_object_create()
 	return object;
 }
 
+CJ_Object *cj_object_copy(CJ_Object *object)
+{
+	CJ_Object *copy = malloc(sizeof(*copy));
+	*copy = *object;
+	copy->elements = malloc(sizeof(*copy->elements) * copy->count_m);
+
+	cj_string_buffer_create(&copy->string_buffer);
+
+	for (uint64_t i = 0; i < copy->count_m; i++)
+	{
+		if (copy->elements[i].name != NULL)
+		{
+			char *name_copy = cj_string_buffer_current(&copy->string_buffer);
+			cj_string_buffer_insert_string(&copy->string_buffer, object->elements[i].name);
+			copy->elements[i].name = name_copy;
+			copy->elements[i].variable = cj_variable_copy(object->elements[i].variable);
+		}
+		else
+		{
+			copy->elements[i].name = NULL;
+			copy->elements[i].variable = NULL;
+		}
+	}
+
+	return copy;
+}
+
 void cj_object_destroy(CJ_Object *object)
 {
-	for(uint64_t i = 0; i < object->count_m; i++)
+	for (uint64_t i = 0; i < object->count_m; i++)
 	{
-		if(object->elements[i].name != NULL)
+		if (object->elements[i].name != NULL)
 		{
 			cj_variable_destroy(object->elements[i].variable);
 		}
@@ -42,14 +69,40 @@ void cj_object_destroy(CJ_Object *object)
 	free(object);
 }
 
+void cj_object_size_increase(CJ_Object *object)
+{
+	object->count_m = object->count_m << 1;
+	CJ_Object_Element *old_elements = object->elements;
+	object->elements = malloc(sizeof(*object->elements) * object->count_m);
+	object->hash_mask = object->hash_mask << 1;
+	object->hash_mask |= 1;
+	for (uint64_t i = 0; i < object->count_m; i++)
+	{
+		object->elements[i].name = NULL;
+		object->elements[i].variable = NULL;
+	}
+	for (uint64_t i = 0; i < object->count_m; i++)
+	{
+		if (old_elements[i].name != NULL)
+		{
+			uint32_t hash = hashlittle(old_elements[i].name, strlen(old_elements[i].name), 0) & object->hash_mask;
+			CJ_Object_Element *list = object->elements;
+			while (list[hash].name != NULL)
+			{
+				hash = (hash + 1) & object->hash_mask;
+			}
+			list[hash].name = old_elements[i].name;
+			list[hash].variable = old_elements[i].variable;
+		}
+	}
+	free(old_elements);
+}
+
 void cj_object_attach(CJ_Object *object, const char *name, CJ_Variable *variable)
 {
 	if (object->count_c == object->count_m)
 	{
-		object->count_m = object->count_m << 1;
-		object->elements = realloc(object->elements, object->count_m);
-		object->hash_mask = object->hash_mask << 1;
-		object->hash_mask != 1;
+		cj_object_size_increase(object);
 	}
 	uint32_t hash = hashlittle(name, strlen(name), 0) & object->hash_mask;
 	CJ_Object_Element *list = object->elements;
@@ -63,7 +116,7 @@ void cj_object_attach(CJ_Object *object, const char *name, CJ_Variable *variable
 		hash = (hash + 1) & object->hash_mask;
 	}
 	char *name_copy = cj_string_buffer_current(&object->string_buffer);
-	cj_string_buffer_insert(&object->string_buffer, name);
+	cj_string_buffer_insert_string(&object->string_buffer, name);
 	list[hash].name = name_copy;
 	list[hash].variable = variable;
 	object->count_c++;
@@ -78,7 +131,7 @@ CJ_Variable *cj_object_detach(CJ_Object *object, const char *name)
 		while (strcmp(name, list[hash].name) != 0)
 		{
 			hash = (hash + 1) & object->hash_mask;
-			if(list[hash].name == NULL)
+			if (list[hash].name == NULL)
 				return NULL;
 		}
 		CJ_Variable *variable = list[hash].variable;
@@ -101,7 +154,7 @@ CJ_Variable *cj_object_get(CJ_Object *object, const char *name)
 		while (strcmp(name, list[hash].name) != 0)
 		{
 			hash = (hash + 1) & object->hash_mask;
-			if(list[hash].name == NULL)
+			if (list[hash].name == NULL)
 				return NULL;
 		}
 		return list[hash].variable;

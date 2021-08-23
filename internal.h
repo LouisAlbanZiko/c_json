@@ -15,7 +15,8 @@ typedef struct _CJ_String_Buffer
 #define C_JSON_DEFAULT_STRING_BUFFER_LENGTH 64
 
 void cj_string_buffer_create(CJ_String_Buffer *buffer);
-void cj_string_buffer_insert(CJ_String_Buffer *buffer, const char *string);
+void cj_string_buffer_insert_string(CJ_String_Buffer *buffer, const char *string);
+void cj_string_buffer_insert_char(CJ_String_Buffer *buffer, char c);
 char *cj_string_buffer_current(CJ_String_Buffer *buffer);
 void cj_string_buffer_destroy(CJ_String_Buffer *buffer);
 
@@ -75,7 +76,7 @@ uint32_t hashlittle(const void *key, size_t length, uint32_t initval);
 typedef struct _CJ_String
 {
 	uint64_t type;
-	const char *value;
+	char *value;
 } CJ_String;
 
 // int

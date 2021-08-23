@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <math.h>
 
+// variable
 enum CJ_Variable_Type
 {
 	CJ_TYPE_NULL = 0,
@@ -19,11 +20,9 @@ enum CJ_Variable_Type
 	CJ_TYPE_COUNT
 };
 
-// variable
 typedef struct _CJ_Variable CJ_Variable;
 
 CJ_Variable *cj_variable_copy(CJ_Variable *variable);
-void cj_variable_set(CJ_Variable *variable, uint64_t type, uint64_t value);
 uint64_t cj_variable_type(CJ_Variable *variable);
 uint64_t cj_variable_value(CJ_Variable *variable);
 void cj_variable_destroy(CJ_Variable *variable);
@@ -72,6 +71,7 @@ const char *cj_string_get(CJ_String *string);
 typedef struct _CJ_Object CJ_Object;
 
 CJ_Object *cj_object_create();
+CJ_Object *cj_object_copy(CJ_Object *object);
 void cj_object_destroy(CJ_Object *object);
 void cj_object_attach(CJ_Object *object, const char *name, CJ_Variable *variable);
 CJ_Variable *cj_object_detach(CJ_Object *object, const char *name);
@@ -81,9 +81,14 @@ CJ_Variable *cj_object_get(CJ_Object *object, const char *name);
 typedef struct _CJ_Array CJ_Array;
 
 CJ_Array *cj_array_create();
+CJ_Array *cj_array_copy(CJ_Array *array);
 void cj_array_destroy(CJ_Array *array);
 void cj_array_attach(CJ_Array *array, uint64_t index, CJ_Variable *variable);
 CJ_Variable *cj_array_detach(CJ_Array *array, uint64_t index);
 CJ_Variable *cj_array_get(CJ_Array *array, uint64_t index);
+
+// util
+CJ_Variable *cj_parse(const char *string);
+const char *cj_stringify(CJ_Variable *variable);
 
 #endif
