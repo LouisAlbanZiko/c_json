@@ -191,7 +191,7 @@ CJ_Variable *cj_parse_number(CJ_ParseData *parse_data)
 	int64_t sign = 1;
 	int64_t nr = 0;
 	int64_t mantis = 0;
-	int64_t mantis_divisor = 10;
+	int64_t mantis_divisor = 1;
 	int64_t exponent = 1;
 	int64_t exponent_sign = 1;
 
@@ -219,6 +219,7 @@ CJ_Variable *cj_parse_number(CJ_ParseData *parse_data)
 	}
 	if (C == 'e' || C == 'E')
 	{
+		exponent = 0;
 		cj_parse_character(parse_data);
 		if(C == '-' || C == '+')
 		{
@@ -232,7 +233,7 @@ CJ_Variable *cj_parse_number(CJ_ParseData *parse_data)
 			cj_parse_character(parse_data);
 		}
 	}
-	if(mantis == 0)
+	if(mantis_divisor == 1)
 	{
 		return (CJ_Variable *) cj_integer_create(sign * powl(nr, exponent_sign * exponent));
 	}
