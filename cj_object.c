@@ -11,7 +11,7 @@ CJ_Object *cj_object_create()
 	{
 		object->hash_mask = 0;
 		uint64_t length = object->count_m;
-		while (length > 0)
+		while (length > 1)
 		{
 			object->hash_mask <<= 1;
 			object->hash_mask |= 1;
@@ -67,6 +67,11 @@ void cj_object_destroy(CJ_Object *object)
 	cj_string_buffer_destroy(&object->string_buffer);
 	free(object->elements);
 	free(object);
+}
+
+uint64_t cj_object_count(CJ_Object *object)
+{
+	return object->count_c;
 }
 
 void cj_object_size_increase(CJ_Object *object)

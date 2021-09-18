@@ -3,6 +3,11 @@
 
 #include "c_json.h"
 
+#include <c_log/c_log.h>
+
+#include <setjmp.h>
+#include <stdarg.h>
+
 // string_buffer
 
 typedef struct _CJ_String_Buffer
@@ -103,6 +108,10 @@ typedef struct _CJ_Bool
 	uint64_t value;
 } CJ_Bool;
 
-
+// error
+extern cj_error_callback _cj_error_callback;
+extern uint32_t _cj_error_callback_print;
+extern CL_Logger *_cj_error_logger;
+void _cj_make_error(uint64_t error_type, const char *format, ...);
 
 #endif

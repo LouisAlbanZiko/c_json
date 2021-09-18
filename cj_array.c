@@ -63,6 +63,11 @@ void cj_array_destroy(CJ_Array *array)
 	free(array);
 }
 
+uint64_t cj_array_count(CJ_Array *array)
+{
+	return array->count_c;
+}
+
 void cj_array_size_increase(CJ_Array *array)
 {
 	array->count_m = array->count_m << 1;

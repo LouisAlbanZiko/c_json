@@ -4,6 +4,6 @@ project "c_json"
 	language "C"
 	
 	files { "**.c" }
-	includedirs { "_vendor", "." }
+	includedirs { "../_vendor", ".", ".." }
 
-	links { "m" }
+	links { "m", "c_log" }
