@@ -84,6 +84,16 @@ void cj_object_attach(CJ_Object *object, const char *name, CJ_Variable *variable
 CJ_Variable *cj_object_detach(CJ_Object *object, const char *name);
 CJ_Variable *cj_object_get(CJ_Object *object, const char *name);
 
+typedef struct _CJ_Object_Iterator
+{
+	const char *name;
+	const CJ_Variable *var;
+} CJ_Object_Iterator;
+
+CJ_Object_Iterator *cj_object_iterator_start(CJ_Object *object);
+CJ_Object_Iterator *cj_object_iterator_next(CJ_Object *object, CJ_Object_Iterator *iterator);
+CJ_Object_Iterator *cj_object_iterator_end(CJ_Object *object);
+
 // array
 typedef struct _CJ_Array CJ_Array;
 
@@ -97,7 +107,13 @@ CJ_Variable *cj_array_get(CJ_Array *array, uint64_t index);
 
 // util
 CJ_Variable *cj_parse(const char *string);
-const char *cj_stringify(CJ_Variable *variable);
+
+typedef struct _CJ_Stringify_Options
+{
+	uint32_t padding;
+	uint32_t number_options;
+} CJ_Stringify_Options;
+const char *cj_stringify(CJ_Variable *variable, CJ_Stringify_Options *options);
 
 // error
 typedef enum _CJ_ErrorType

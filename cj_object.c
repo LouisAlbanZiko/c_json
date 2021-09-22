@@ -169,3 +169,24 @@ CJ_Variable *cj_object_get(CJ_Object *object, const char *name)
 		return NULL;
 	}
 }
+
+CJ_Object_Iterator *cj_object_iterator_start(CJ_Object *object)
+{
+	return cj_object_iterator_next(object, (CJ_Object_Iterator *)(object->elements - 1)); 
+}
+
+CJ_Object_Iterator *cj_object_iterator_next(CJ_Object *object, CJ_Object_Iterator *iterator)
+{
+	do
+	{
+		iterator++;
+	} while(iterator->name == NULL && iterator != cj_object_iterator_end(object));
+	return (CJ_Object_Iterator *)iterator;
+}
+
+CJ_Object_Iterator *cj_object_iterator_end(CJ_Object *object)
+{
+	return (CJ_Object_Iterator *) (object->elements + object->count_m);
+}
+
+
