@@ -6,4 +6,7 @@ project "c_json"
 	files { "**.c" }
 	includedirs { "../_vendor", ".", ".." }
 
-	links { "m", "c_log" }
+	links { "c_log" }
+
+	filter "system:linux"
+		links { "m" }
