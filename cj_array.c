@@ -2,7 +2,7 @@
 
 CJ_Array *cj_array_create()
 {
-	CJ_Array *array = malloc(sizeof(*array));
+	CJ_Array *array = (CJ_Array *)cm_heap_alloc(g_cj_heap_variable, sizeof(*array));
 	array->type = CJ_TYPE_ARRAY;
 	array->count_c = 0;
 	array->count_m = C_JSON_DEFAULT_ARRAY_LENGTH;
@@ -29,7 +29,7 @@ CJ_Array *cj_array_create()
 
 CJ_Array *cj_array_copy(CJ_Array *array)
 {
-	CJ_Array *copy = malloc(sizeof(*copy));
+	CJ_Array *copy = cm_heap_alloc(g_cj_heap_variable, sizeof(*copy));
 	*copy = *array;
 	copy->elements = malloc(sizeof(*copy->elements) * copy->count_m);
 
@@ -60,7 +60,7 @@ void cj_array_destroy(CJ_Array *array)
 		}
 	}
 	free(array->elements);
-	free(array);
+	cm_heap_free(g_cj_heap_variable, array);
 }
 
 uint64_t cj_array_count(CJ_Array *array)

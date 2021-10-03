@@ -3,10 +3,10 @@ project "c_json"
 	kind "StaticLib"
 	language "C"
 	
-	files { "**.c" }
+	files { "**.c", "**.h" }
 	includedirs { "../_vendor", ".", ".." }
 
-	links { "c_log" }
+	links { "c_log", "c_mem" }
 
 	filter "system:linux"
 		links { "m" }

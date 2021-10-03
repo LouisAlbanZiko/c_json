@@ -19,6 +19,10 @@ enum CJ_Variable_Type
 	CJ_TYPE_COUNT
 };
 
+// setup
+void cj_init();
+void cj_terminate();
+
 // variable
 typedef struct _CJ_Variable CJ_Variable;
 

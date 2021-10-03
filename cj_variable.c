@@ -53,3 +53,13 @@ void cj_variable_destroy(CJ_Variable *variable)
 		return;
 	}
 }
+
+CJ_Variable *_cj_variable_alloc()
+{
+	return (CJ_Variable *)cm_heap_alloc(g_cj_heap_variable, sizeof(CJ_Variable));
+}
+
+void _cj_variable_free(CJ_Variable *var)
+{
+	cm_heap_free(g_cj_heap_variable, var);
+}

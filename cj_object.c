@@ -2,11 +2,11 @@
 
 CJ_Object *cj_object_create()
 {
-	CJ_Object *object = malloc(sizeof(*object));
+	CJ_Object *object = (CJ_Object *)cm_heap_alloc(g_cj_heap_variable, sizeof(*object));
 	object->type = CJ_TYPE_OBJECT;
 	object->count_c = 0;
 	object->count_m = C_JSON_DEFAULT_OBJECT_LENGTH;
-	cj_string_buffer_create(&object->string_buffer);
+	object->name_heap = cm_heap_string_create_with_size(128);
 	// hash_mask generation
 	{
 		object->hash_mask = 0;
@@ -30,18 +30,17 @@ CJ_Object *cj_object_create()
 
 CJ_Object *cj_object_copy(CJ_Object *object)
 {
-	CJ_Object *copy = malloc(sizeof(*copy));
+	CJ_Object *copy = (CJ_Object *)cm_heap_alloc(g_cj_heap_variable, sizeof(*copy));
 	*copy = *object;
 	copy->elements = malloc(sizeof(*copy->elements) * copy->count_m);
 
-	cj_string_buffer_create(&copy->string_buffer);
+	object->name_heap = cm_heap_string_create_with_size(128);
 
 	for (uint64_t i = 0; i < copy->count_m; i++)
 	{
 		if (copy->elements[i].name != NULL)
 		{
-			char *name_copy = cj_string_buffer_current(&copy->string_buffer);
-			cj_string_buffer_insert_string(&copy->string_buffer, object->elements[i].name);
+			char *name_copy = cm_heap_string_alloc_and_copy(copy->name_heap, object->elements[i].name);
 			copy->elements[i].name = name_copy;
 			copy->elements[i].variable = cj_variable_copy(object->elements[i].variable);
 		}
@@ -64,9 +63,9 @@ void cj_object_destroy(CJ_Object *object)
 			cj_variable_destroy(object->elements[i].variable);
 		}
 	}
-	cj_string_buffer_destroy(&object->string_buffer);
+	cm_heap_string_destroy(object->name_heap);
 	free(object->elements);
-	free(object);
+	cm_heap_free(g_cj_heap_variable, object);
 }
 
 uint64_t cj_object_count(CJ_Object *object)
@@ -120,8 +119,7 @@ void cj_object_attach(CJ_Object *object, const char *name, CJ_Variable *variable
 		}
 		hash = (hash + 1) & object->hash_mask;
 	}
-	char *name_copy = cj_string_buffer_current(&object->string_buffer);
-	cj_string_buffer_insert_string(&object->string_buffer, name);
+	char *name_copy = cm_heap_string_alloc_and_copy(object->name_heap, name);
 	list[hash].name = name_copy;
 	list[hash].variable = variable;
 	object->count_c++;

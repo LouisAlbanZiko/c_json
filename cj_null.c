@@ -2,7 +2,7 @@
 
 CJ_Null *cj_null_create()
 {
-	CJ_Variable *var = malloc(sizeof(*var));
+	CJ_Variable *var = _cj_variable_alloc();
 	var->type = CJ_TYPE_NULL;
 	var->value = 0;
 	return (CJ_Null *)var;
@@ -10,5 +10,5 @@ CJ_Null *cj_null_create()
 
 void cj_null_destroy(CJ_Null *var)
 {
-	free(var);
+	_cj_variable_free(var);
 }

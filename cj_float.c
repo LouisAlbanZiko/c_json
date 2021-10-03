@@ -2,7 +2,7 @@
 
 CJ_Float *cj_float_create(double value)
 {
-	CJ_Float *_float = malloc(sizeof(*_float));
+	CJ_Float *_float = _cj_variable_alloc();
 	_float->type = CJ_TYPE_FLOAT;
 	_float->value = value;
 	return _float;
@@ -15,7 +15,7 @@ CJ_Float *cj_float_copy(CJ_Float *_float)
 
 void cj_float_destroy(CJ_Float *_float)
 {
-	free(_float);
+	_cj_variable_free(_float);
 }
 
 void cj_float_set(CJ_Float *_float, double value)

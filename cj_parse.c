@@ -131,9 +131,7 @@ CJ_Variable *cj_parse_string(CJ_ParseData *parse_data)
 {
 	cj_parse_character(parse_data);
 
-	CJ_String_Buffer string_buffer;
-	cj_string_buffer_create(&string_buffer);
-	const char *start = string_buffer.data;
+	CM_StringBuffer *string_buffer = cm_string_buffer_create_with_size(128);
 	while (C != '"')
 	{
 		char insert_char = C;
@@ -174,13 +172,16 @@ CJ_Variable *cj_parse_string(CJ_ParseData *parse_data)
 				break;
 			}
 		}
-		cj_string_buffer_insert_char(&string_buffer, insert_char);
+		cm_string_buffer_insert_char(string_buffer, insert_char);
 		cj_parse_character(parse_data);
 	}
-	cj_string_buffer_insert_char(&string_buffer, '\0');
 	cj_parse_character(parse_data);
-	CJ_String *cj_str = cj_string_create(start);
-	cj_string_buffer_destroy(&string_buffer);
+
+	const char *string = cm_string_buffer_data(string_buffer);
+	
+	CJ_String *cj_str = cj_string_create(string);
+
+	cm_string_buffer_destroy(string_buffer);
 
 	return (CJ_Variable *)cj_str;
 }
@@ -195,7 +196,7 @@ CJ_Variable *cj_parse_number(CJ_ParseData *parse_data)
 	int64_t exponent = 1;
 	int64_t exponent_sign = 1;
 
-	if (C == '-' && C == '+')
+	if (C == '-' || C == '+')
 	{
 		sign = (C == '-') * (-1) + (C == '+') * 1;
 		cj_parse_character(parse_data);

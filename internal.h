@@ -4,26 +4,14 @@
 #include "c_json.h"
 
 #include <c_log/c_log.h>
+#include <c_mem/c_mem.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
 
-// string_buffer
-
-typedef struct _CJ_String_Buffer
-{
-	uint32_t count_c;
-	uint32_t count_m;
-	char *data;
-} CJ_String_Buffer;
-
-#define C_JSON_DEFAULT_STRING_BUFFER_LENGTH 64
-
-void cj_string_buffer_create(CJ_String_Buffer *buffer);
-void cj_string_buffer_insert_string(CJ_String_Buffer *buffer, const char *string);
-void cj_string_buffer_insert_char(CJ_String_Buffer *buffer, char c);
-char *cj_string_buffer_current(CJ_String_Buffer *buffer);
-void cj_string_buffer_destroy(CJ_String_Buffer *buffer);
+// CJ_Variable heap
+extern CM_Heap *g_cj_heap_variable;
+extern CM_HeapString *g_cj_heap_string;
 
 // variable
 
@@ -32,6 +20,9 @@ typedef struct _CJ_Variable
 	uint64_t type;
 	uint64_t value;
 } CJ_Variable;
+
+CJ_Variable *_cj_variable_alloc();
+void _cj_variable_free(CJ_Variable *var);
 
 // object
 
@@ -44,7 +35,7 @@ typedef struct _CJ_Object_Element
 typedef struct _CJ_Object
 {
 	uint64_t type;
-	CJ_String_Buffer string_buffer;
+	CM_HeapString *name_heap;
 	uint64_t count_c;
 	uint64_t count_m;
 	uint64_t hash_mask;

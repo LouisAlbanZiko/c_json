@@ -2,7 +2,7 @@
 
 CJ_Integer *cj_integer_create(int64_t value)
 {
-	CJ_Integer *integer = malloc(sizeof(*integer));
+	CJ_Integer *integer = _cj_variable_alloc();
 	integer->type = CJ_TYPE_INT;
 	integer->value = value;
 	return integer;
@@ -15,7 +15,7 @@ CJ_Integer *cj_integer_copy(CJ_Integer *integer)
 
 void cj_integer_destroy(CJ_Integer *integer)
 {
-	free(integer);
+	_cj_variable_free(integer);
 }
 
 void cj_integer_set(CJ_Integer *integer, int64_t value)
