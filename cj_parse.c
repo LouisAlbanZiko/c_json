@@ -34,7 +34,7 @@ CJ_Variable *cj_parse(const char *string)
 			.start = string,
 			.current = string,
 			.end = string + strlen(string),
-			.line = 0,
+			.line = 1,
 			.character_in_line = 0};
 
 	CJ_Variable *variable = NULL;
