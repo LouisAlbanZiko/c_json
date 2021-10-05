@@ -48,7 +48,6 @@ typedef struct _CJ_Object
 
 typedef struct _CJ_Array_Element
 {
-	uint64_t name;
 	CJ_Variable *variable;
 } CJ_Array_Element;
 
@@ -57,7 +56,6 @@ typedef struct _CJ_Array
 	uint64_t type;
 	uint64_t count_c;
 	uint64_t count_m;
-	uint64_t hash_mask;
 	CJ_Array_Element *elements;
 } CJ_Array;
 

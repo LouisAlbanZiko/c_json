@@ -105,9 +105,18 @@ CJ_Array *cj_array_create();
 CJ_Array *cj_array_copy(CJ_Array *array);
 void cj_array_destroy(CJ_Array *array);
 uint64_t cj_array_count(CJ_Array *array);
-void cj_array_attach(CJ_Array *array, uint64_t index, CJ_Variable *variable);
+void cj_array_attach(CJ_Array *array, CJ_Variable *variable);
 CJ_Variable *cj_array_detach(CJ_Array *array, uint64_t index);
 CJ_Variable *cj_array_get(CJ_Array *array, uint64_t index);
+
+typedef struct _CJ_Array_Iterator
+{
+	const CJ_Variable *var;
+} CJ_Array_Iterator;
+
+CJ_Array_Iterator *cj_array_iterator_start(CJ_Array *array);
+CJ_Array_Iterator *cj_array_iterator_next(CJ_Array *array, CJ_Array_Iterator *iterator);
+CJ_Array_Iterator *cj_array_iterator_end(CJ_Array *array);
 
 // util
 CJ_Variable *cj_parse(const char *string);
