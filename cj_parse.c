@@ -100,7 +100,9 @@ CJ_Variable *cj_parse_value(CJ_ParseData *parse_data)
 			variable = (CJ_Variable *)cj_bool_create((uint64_t)0);
 		}
 		else
+		{
 			CJ_MAKE_PARSE_ERROR(CJ_ERROR_UNEXPECTED_TOKEN, "Unexpected token '%s' on line %d, character %d.", &C, parse_data->line, parse_data->character_in_line);
+		}
 	}
 	else if (C == 'n')
 	{
@@ -288,6 +290,8 @@ CJ_Variable *cj_parse_object(CJ_ParseData *parse_data)
 		}
 	}
 
+	cj_parse_character(parse_data);
+
 	return (CJ_Variable *)object;
 }
 
@@ -297,10 +301,10 @@ CJ_Variable *cj_parse_array(CJ_ParseData *parse_data)
 
 	cj_parse_character(parse_data);
 	cj_parse_whitespace(parse_data);
-	while (C != ']')
+	while (1)
 	{
 		CJ_Variable *var = cj_parse_value(parse_data);
-		cj_array_attach(array, cj_array_count(array), var);
+		cj_array_attach(array, var);
 
 		cj_parse_whitespace(parse_data);
 		if (C == ',')
@@ -317,6 +321,8 @@ CJ_Variable *cj_parse_array(CJ_ParseData *parse_data)
 			CJ_MAKE_PARSE_ERROR(CJ_ERROR_UNEXPECTED_TOKEN, "Unexpected character while parsing cj_array '%c' on line %d, character %d.", C, parse_data->line, parse_data->character_in_line);
 		}
 	}
+
+	cj_parse_character(parse_data);
 
 	return (CJ_Variable *)array;
 }
