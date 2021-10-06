@@ -25,7 +25,20 @@ void cj_stringify_variable(CJ_Variable *variable, CJ_Stringify_Data *s_data)
 	switch(variable->type)
 	{
 		case CJ_TYPE_NULL:
+		{
 			cm_string_buffer_insert_string(s_data->buffer, _null);
 			break;
+		}
+		case CJ_TYPE_INT:
+		{
+			int64_t nr = cj_integer_get((CJ_Integer *)variable);
+			while (nr != 0)
+			{
+				cm_string_buffer_insert_char(s_data->buffer, (nr % 10));
+				nr /= 10;
+			}
+			break;
+		}
+			
 	}
 }

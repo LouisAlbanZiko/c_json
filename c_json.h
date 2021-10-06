@@ -121,13 +121,13 @@ CJ_Array_Iterator *cj_array_iterator_end(CJ_Array *array);
 // util
 CJ_Variable *cj_parse(const char *string);
 
-typedef struct _CJ_Stringify_Options
+/*typedef struct _CJ_Stringify_Options
 {
 	uint32_t padding;
 	uint32_t number_options;
 } CJ_Stringify_Options;
 
-const char *cj_stringify(CJ_Variable *variable, CJ_Stringify_Options *options);
+const char *cj_stringify(CJ_Variable *variable, CJ_Stringify_Options *options);*/
 
 void cj_fprintf(FILE *file, CJ_Variable *var);
 
