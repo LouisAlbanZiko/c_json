@@ -1,5 +1,6 @@
 #include "internal.h"
 
+/*
 typedef struct _CJ_Stringify_Data
 {
 	CM_StringBuffer *buffer;
@@ -42,3 +43,4 @@ void cj_stringify_variable(CJ_Variable *variable, CJ_Stringify_Data *s_data)
 			
 	}
 }
+*/

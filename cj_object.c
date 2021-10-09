@@ -2,7 +2,7 @@
 
 CJ_Object *cj_object_create()
 {
-	CJ_Object *object = (CJ_Object *)cm_heap_alloc(g_cj_heap_variable, sizeof(*object));
+	_CJ_Object *object = (_CJ_Object *)cm_heap_alloc(g_cj_heap_variable, sizeof(*object));
 	object->type = CJ_TYPE_OBJECT;
 	object->count_c = 0;
 	object->count_m = C_JSON_DEFAULT_OBJECT_LENGTH;
@@ -25,12 +25,13 @@ CJ_Object *cj_object_create()
 		object->elements[i].name = NULL;
 		object->elements[i].variable = NULL;
 	}
-	return object;
+	return (CJ_Object *)object;
 }
 
-CJ_Object *cj_object_copy(CJ_Object *object)
+CJ_Object *cj_object_copy(CJ_Object *object_external)
 {
-	CJ_Object *copy = (CJ_Object *)cm_heap_alloc(g_cj_heap_variable, sizeof(*copy));
+	_CJ_Object *object = (_CJ_Object *)object_external;
+	_CJ_Object *copy = (_CJ_Object *)cm_heap_alloc(g_cj_heap_variable, sizeof(*copy));
 	*copy = *object;
 	copy->elements = malloc(sizeof(*copy->elements) * copy->count_m);
 
@@ -51,11 +52,12 @@ CJ_Object *cj_object_copy(CJ_Object *object)
 		}
 	}
 
-	return copy;
+	return (CJ_Object *)copy;
 }
 
-void cj_object_destroy(CJ_Object *object)
+void cj_object_destroy(CJ_Object *object_external)
 {
+	_CJ_Object *object = (_CJ_Object *)object_external;
 	for (uint64_t i = 0; i < object->count_m; i++)
 	{
 		if (object->elements[i].name != NULL)
@@ -68,13 +70,15 @@ void cj_object_destroy(CJ_Object *object)
 	cm_heap_free(g_cj_heap_variable, object);
 }
 
-uint64_t cj_object_count(CJ_Object *object)
+uint64_t cj_object_count(CJ_Object *object_external)
 {
+	_CJ_Object *object = (_CJ_Object *)object_external;
 	return object->count_c;
 }
 
-void cj_object_size_increase(CJ_Object *object)
+void cj_object_size_increase(CJ_Object *object_external)
 {
+	_CJ_Object *object = (_CJ_Object *)object_external;
 	object->count_m = object->count_m << 1;
 	CJ_Object_Element *old_elements = object->elements;
 	object->elements = malloc(sizeof(*object->elements) * object->count_m);
@@ -102,11 +106,12 @@ void cj_object_size_increase(CJ_Object *object)
 	free(old_elements);
 }
 
-void cj_object_attach(CJ_Object *object, const char *name, CJ_Variable *variable)
+void cj_object_attach(CJ_Object *object_external, const char *name, CJ_Variable *variable)
 {
+	_CJ_Object *object = (_CJ_Object *)object_external;
 	if (object->count_c == object->count_m)
 	{
-		cj_object_size_increase(object);
+		cj_object_size_increase(object_external);
 	}
 	uint32_t hash = hashlittle(name, strlen(name), 0) & object->hash_mask;
 	CJ_Object_Element *list = object->elements;
@@ -125,8 +130,9 @@ void cj_object_attach(CJ_Object *object, const char *name, CJ_Variable *variable
 	object->count_c++;
 }
 
-CJ_Variable *cj_object_detach(CJ_Object *object, const char *name)
+CJ_Variable *cj_object_detach(CJ_Object *object_external, const char *name)
 {
+	_CJ_Object *object = (_CJ_Object *)object_external;
 	uint32_t hash = hashlittle(name, strlen(name), 0) & object->hash_mask;
 	CJ_Object_Element *list = object->elements;
 	if (list[hash].name != NULL)
@@ -148,8 +154,9 @@ CJ_Variable *cj_object_detach(CJ_Object *object, const char *name)
 	}
 }
 
-CJ_Variable *cj_object_get(CJ_Object *object, const char *name)
+CJ_Variable *cj_object_get(CJ_Object *object_external, const char *name)
 {
+	_CJ_Object *object = (_CJ_Object *)object_external;
 	uint32_t hash = hashlittle(name, strlen(name), 0) & object->hash_mask;
 	CJ_Object_Element *list = object->elements;
 	if (list[hash].name != NULL)
@@ -168,9 +175,10 @@ CJ_Variable *cj_object_get(CJ_Object *object, const char *name)
 	}
 }
 
-CJ_Object_Iterator *cj_object_iterator_start(CJ_Object *object)
+CJ_Object_Iterator *cj_object_iterator_start(CJ_Object *object_external)
 {
-	return cj_object_iterator_next(object, (CJ_Object_Iterator *)(object->elements - 1)); 
+	_CJ_Object *object = (_CJ_Object *)object_external;
+	return cj_object_iterator_next(object_external, (CJ_Object_Iterator *)(object->elements - 1)); 
 }
 
 CJ_Object_Iterator *cj_object_iterator_next(CJ_Object *object, CJ_Object_Iterator *iterator)
@@ -182,8 +190,9 @@ CJ_Object_Iterator *cj_object_iterator_next(CJ_Object *object, CJ_Object_Iterato
 	return (CJ_Object_Iterator *)iterator;
 }
 
-CJ_Object_Iterator *cj_object_iterator_end(CJ_Object *object)
+CJ_Object_Iterator *cj_object_iterator_end(CJ_Object *object_external)
 {
+	_CJ_Object *object = (_CJ_Object *)object_external;
 	return (CJ_Object_Iterator *) (object->elements + object->count_m);
 }
 

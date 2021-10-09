@@ -238,7 +238,7 @@ CJ_Variable *cj_parse_number(CJ_ParseData *parse_data)
 	}
 	if(mantis_divisor == 1)
 	{
-		return (CJ_Variable *) cj_integer_create(sign * powl(nr, exponent_sign * exponent));
+		return (CJ_Variable *)cj_integer_create(sign * (int64_t)pow((double)nr, (double)exponent_sign * (double)exponent));
 	}
 	else
 	{
@@ -329,8 +329,8 @@ CJ_Variable *cj_parse_array(CJ_ParseData *parse_data)
 
 uint32_t cj_parse_strcmp(const char *s1, const char *s2)
 {
-	uint32_t length = strlen(s1);
-	uint32_t i;
+	uint64_t length = strlen(s1);
+	uint64_t i;
 	for (i = 0; i < length && s2[i] != '\0'; i++)
 	{
 		if (s1[i] != s2[i])

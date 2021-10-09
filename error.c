@@ -10,7 +10,7 @@ void _cj_make_error(uint64_t error_type, const char *format, ...)
 	va_start(va_args, format);
 
 	char message[1024];
-	vsprintf(message, format, va_args);
+	vsprintf_s(message, sizeof(message), format, va_args);
 	if (_cj_error_callback != NULL)
 	{
 		_cj_error_callback(error_type, message);

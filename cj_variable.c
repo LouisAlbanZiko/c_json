@@ -16,6 +16,8 @@ CJ_Variable *cj_variable_copy(CJ_Variable *variable)
 		return (CJ_Variable *)cj_object_copy((CJ_Object *)variable);
 	case CJ_TYPE_ARRAY:
 		return (CJ_Variable *)cj_array_copy((CJ_Array *)variable);
+	default:
+		return NULL;
 	}
 }
 

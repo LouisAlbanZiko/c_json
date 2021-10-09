@@ -21,7 +21,7 @@ void cj_fprintf_variable(FILE *file, CJ_Variable *var, uint64_t depth)
 	}
 	case CJ_TYPE_INT:
 	{
-		fprintf(file, "%ld", cj_integer_get((CJ_Integer *)var));
+		fprintf(file, "%I64d", cj_integer_get((CJ_Integer *)var));
 		break;
 	}
 	case CJ_TYPE_FLOAT:
@@ -34,7 +34,7 @@ void cj_fprintf_variable(FILE *file, CJ_Variable *var, uint64_t depth)
 		static const char *_true = "true";
 		static const char *_false = "false";
 		uint64_t val = cj_bool_get((CJ_Bool *)var);
-		const char *val_s = (uint64_t)_true * val + (uint64_t)_false * !val;
+		const char *val_s = (const char *)((uint64_t)_true * val + (uint64_t)_false * !val);
 		fprintf(file, "%s", val_s);
 		break;
 	}
@@ -80,7 +80,7 @@ void cj_fprintf_variable(FILE *file, CJ_Variable *var, uint64_t depth)
 			for (uint64_t i = 0; i <= depth; i++)
 				fprintf(file, "\t");
 			cj_fprintf_variable(file, iter->var, depth + 1);
-			if (cj_object_iterator_next(array, iter) != cj_object_iterator_end(array))
+			if (cj_array_iterator_next(array, iter) != cj_array_iterator_end(array))
 			{
 				fprintf(file, ",\n");
 			}

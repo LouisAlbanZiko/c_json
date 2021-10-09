@@ -2,10 +2,10 @@
 
 CJ_Bool *cj_bool_create(uint64_t value)
 {
-	CJ_Bool *bool = _cj_variable_alloc();
+	_CJ_Bool *bool = (_CJ_Bool *)_cj_variable_alloc();
 	bool->type = CJ_TYPE_BOOL;
 	bool->value = value;
-	return bool;
+	return (CJ_Bool *)bool;
 }
 
 CJ_Bool *cj_bool_copy(CJ_Bool *bool)
@@ -15,11 +15,12 @@ CJ_Bool *cj_bool_copy(CJ_Bool *bool)
 
 void cj_bool_destroy(CJ_Bool *bool)
 {
-	_cj_variable_free(bool);
+	_cj_variable_free((CJ_Variable *)bool);
 }
 
-void cj_bool_set(CJ_Bool *bool, uint64_t value)
+void cj_bool_set(CJ_Bool *bool_external, uint64_t value)
 {
+	_CJ_Bool *bool = (_CJ_Bool *)bool_external;
 	bool->value = value;
 }
 
