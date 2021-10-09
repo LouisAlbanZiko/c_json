@@ -5,6 +5,7 @@ CM_HeapString* g_cj_heap_string = NULL;
 
 void cj_init()
 {
+	cj_error_callback_print_set(CJ_ERROR_PRINT_ENABLED);
 	g_cj_heap_variable = cm_heap_create();
 	g_cj_heap_string = cm_heap_string_create();
 }
