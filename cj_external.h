@@ -22,7 +22,7 @@ typedef struct CJ_Variable
 
 CJ_Variable *cj_variable_copy(CJ_Variable *variable);
 uint64_t cj_variable_type(CJ_Variable *variable);
-uint64_t cj_variable_value(CJ_Variable *variable);
+//uint64_t cj_variable_value(CJ_Variable *variable);
 void cj_variable_destroy(CJ_Variable *variable);
 
 // null

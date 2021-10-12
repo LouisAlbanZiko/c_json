@@ -26,10 +26,10 @@ uint64_t cj_variable_type(CJ_Variable *variable)
 	return variable->type;
 }
 
-uint64_t cj_variable_value(CJ_Variable *variable)
+/*uint64_t cj_variable_value(CJ_Variable *variable)
 {
 	return variable->value;
-}
+}*/
 
 void cj_variable_destroy(CJ_Variable *variable)
 {
