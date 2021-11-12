@@ -31,8 +31,8 @@ void cj_fprintf_variable(FILE *file, CJ_Variable *var, uint64_t depth)
 	}
 	case CJ_TYPE_BOOL:
 	{
-		static const char *_true = "true";
-		static const char *_false = "false";
+		static const char const *_true = "true";
+		static const char const *_false = "false";
 		uint64_t val = cj_bool_get((CJ_Bool *)var);
 		const char *val_s = (const char *)((uint64_t)_true * val + (uint64_t)_false * !val);
 		fprintf(file, "%s", val_s);
