@@ -11,7 +11,7 @@
 
 // CJ_Variable heap
 extern CM_Heap *g_cj_heap_variable;
-extern CM_HeapString *g_cj_heap_string;
+extern CM_Heap *g_cj_heap_string;
 
 // variable
 
@@ -35,7 +35,7 @@ typedef struct _CJ_Object_Element
 typedef struct _CJ_Object
 {
 	uint64_t type;
-	CM_HeapString *name_heap;
+	CM_Heap *name_heap;
 	uint64_t count_c;
 	uint64_t count_m;
 	uint64_t hash_mask;
