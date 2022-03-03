@@ -1,34 +1,34 @@
 #include "internal.h"
 
-CJ_String *cj_string_create(const char *value)
+CJ_String *cj_string_create(CM_String value)
 {
-	_CJ_String *string = (_CJ_String *)_cj_variable_alloc();
-	string->type = CJ_TYPE_STRING;
-	string->value = cm_heap_string_alloc_and_copy(g_cj_heap_string, value);
-	return (CJ_String *)string;
+	_CJ_String *var = malloc(sizeof(*var));
+
+	var->type = CJ_TYPE_STRING;
+	var->value = cm_string_copy(NULL, value);
+
+	return (CJ_String *)var;
 }
 
-CJ_String *cj_string_copy(CJ_String *string)
+CJ_String *cj_string_copy(CJ_String *var)
 {
-	CJ_String *copy = cj_string_create(string->value);
-	return copy;
+	return cj_string_create(((_CJ_String *)var)->value);
 }
 
-void cj_string_destroy(CJ_String *string_external)
+void cj_string_destroy(CJ_String *var)
 {
-	_CJ_String *string = (_CJ_String *)string_external;
-	cm_heap_string_free(g_cj_heap_string, string->value);
-	_cj_variable_free((CJ_Variable *)string);
+	cm_string_destroy(((_CJ_String *)var)->value);
+	free(var);
 }
 
-void cj_string_set(CJ_String *string_external, const char *value)
+void cj_string_set(CJ_String *string, CM_String value)
 {
-	_CJ_String *string = (_CJ_String *)string_external;
-	cm_heap_string_free(g_cj_heap_string, string->value);
-	string->value = cm_heap_string_alloc_and_copy(g_cj_heap_string, value);
+	_CJ_String *_var = (_CJ_String *)string;
+	cm_string_destroy(_var->value);
+	_var->value = cm_string_copy(NULL, value);
 }
 
-const char *cj_string_get(CJ_String *string)
+CM_String cj_string_get(CJ_String *string)
 {
-	return string->value;
+	return ((_CJ_String *)string)->value;
 }

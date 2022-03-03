@@ -6,7 +6,7 @@ project "c_json"
 	files { "**.c", "**.h" }
 	includedirs { "../_vendor", ".", ".." }
 
-	links { "c_log", "c_mem" }
+	links { "c_mem" }
 
-	filter "system:linux"
-		links { "m" }
+	filter "configurations:Debug"
+		defines "CM_DEBUG"

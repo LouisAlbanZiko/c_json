@@ -2,30 +2,31 @@
 
 CJ_Float *cj_float_create(double value)
 {
-	_CJ_Float *_float = (_CJ_Float *)_cj_variable_alloc();
-	_float->type = CJ_TYPE_FLOAT;
-	_float->value = value;
-	return (CJ_Float *)_float;
+	_CJ_Float *var = malloc(sizeof(*var));
+
+	var->type = CJ_TYPE_FLOAT;
+	var->value = value;
+
+	return (CJ_Float *)var;
 }
 
-CJ_Float *cj_float_copy(CJ_Float *_float_external)
+CJ_Float *cj_float_copy(CJ_Float *var)
 {
-	_CJ_Float *_float = (_CJ_Float *)_float_external;
-	return cj_float_create(_float->value);
+	return cj_float_create(var->value);
 }
 
-void cj_float_destroy(CJ_Float *_float)
+void cj_float_destroy(CJ_Float *var)
 {
-	_cj_variable_free((CJ_Variable *)_float);
+	free(var);
 }
 
-void cj_float_set(CJ_Float *_float_external, double value)
+void cj_float_set(CJ_Float *var, double value)
 {
-	_CJ_Float *_float = (_CJ_Float *)_float_external;
-	_float->value = value;
+	_CJ_Float *_var = (_CJ_Float *)var;
+	_var->value = value;
 }
 
-double cj_float_get(CJ_Float *_float)
+double cj_float_get(CJ_Float *var)
 {
-	return _float->value;
+	return var->value;
 }

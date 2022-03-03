@@ -7,109 +7,157 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "cj_external.h"
+#include <c_mem/c_mem.h>
 
-// setup
-void cj_init();
-void cj_terminate();
+typedef enum CJ_VariableType
+{
+	CJ_TYPE_NULL = 0,
+	CJ_TYPE_INTEGER,
+	CJ_TYPE_FLOAT,
+	CJ_TYPE_BOOL,
+	CJ_TYPE_STRING,
+	CJ_TYPE_OBJECT,
+	CJ_TYPE_ARRAY,
+	CJ_TYPE_COUNT
+} CJ_VariableType;
+
+typedef struct CJ_Variable
+{
+	const uint64_t type;
+	const uint64_t value;
+} CJ_Variable;
+
+CJ_Variable *cj_variable_copy(CJ_Variable *var);
+void cj_variable_destroy(CJ_Variable *variable);
+
+uint64_t cj_variable_type(CJ_Variable *variable);
+
+// null
+typedef struct CJ_Null
+{
+	const uint64_t type;
+	const uint64_t value;
+} CJ_Null;
+
+CJ_Null *cj_null_create();
+void cj_null_destroy(CJ_Null *var);
+
+// integer
+typedef struct CJ_Integer
+{
+	const uint64_t type;
+	int64_t value;
+} CJ_Integer;
+
+CJ_Integer *cj_integer_create(int64_t value);
+CJ_Integer *cj_integer_copy(CJ_Integer *var);
+void cj_integer_destroy(CJ_Integer *var);
+
+void cj_integer_set(CJ_Integer *var, int64_t value);
+int64_t cj_integer_get(CJ_Integer *var);
+
+// float
+typedef struct CJ_Float
+{
+	const uint64_t type;
+	double value;
+} CJ_Float;
+
+CJ_Float *cj_float_create(double value);
+CJ_Float *cj_float_copy(CJ_Float *var);
+void cj_float_destroy(CJ_Float *var);
+
+void cj_float_set(CJ_Float *var, double value);
+double cj_float_get(CJ_Float *var);
+
+// boolean
+typedef struct CJ_Bool
+{
+	const uint64_t type;
+	uint64_t value;
+} CJ_Bool;
+
+#define CJ_FALSE 0
+#define CJ_TRUE 1
+
+CJ_Bool *cj_bool_create(uint64_t value);
+CJ_Bool *cj_bool_copy(CJ_Bool *var);
+void cj_bool_destroy(CJ_Bool *var);
+
+void cj_bool_set(CJ_Bool *var, uint64_t value);
+uint64_t cj_bool_get(CJ_Bool *var);
+
+// string
+typedef struct CJ_String
+{
+	const uint64_t type;
+	const char *const value;
+	const uint64_t length;
+} CJ_String;
+
+CJ_String *cj_string_create(CM_String value);
+CJ_String *cj_string_copy(CJ_String *var);
+void cj_string_destroy(CJ_String *var);
+
+void cj_string_set(CJ_String *string, CM_String value);
+CM_String cj_string_get(CJ_String *string);
+
+// object
+typedef struct CJ_Object
+{
+	const uint64_t type;
+} CJ_Object;
+
+CJ_Object *cj_object_create();
+CJ_Object *cj_object_copy(CJ_Object *var);
+void cj_object_destroy(CJ_Object *var);
+
+uint64_t cj_object_count(CJ_Object *var);
+void cj_object_attach(CJ_Object *object, CM_String name, CJ_Variable *var);
+CJ_Variable *cj_object_detach(CJ_Object *object, CM_String name);
+CJ_Variable *cj_object_get(CJ_Object *object, CM_String name);
+
+typedef struct CJ_Object_Iterator
+{
+	const char *const name;
+	const uint64_t name_length;
+	const CJ_Variable *var;
+} CJ_Object_Iterator;
+
+CJ_Object_Iterator *cj_object_iterator_begin(CJ_Object *object);
+CJ_Object_Iterator *cj_object_iterator_next(CJ_Object *object, CJ_Object_Iterator *iterator);
+CJ_Object_Iterator *cj_object_iterator_end(CJ_Object *object);
+
+// array
+typedef struct CJ_Array
+{
+	const uint64_t type;
+} CJ_Array;
+
+CJ_Array *cj_array_create();
+CJ_Array *cj_array_copy(CJ_Array *var);
+void cj_array_destroy(CJ_Array *var);
+
+uint64_t cj_array_count(CJ_Array *array);
+void cj_array_attach(CJ_Array *array, CJ_Variable *variable);
+CJ_Variable *cj_array_detach(CJ_Array *array, uint64_t index);
+void cj_array_set(CJ_Array *array, uint64_t index, CJ_Variable *var);
+CJ_Variable *cj_array_get(CJ_Array *array, uint64_t index);
+
+typedef struct _CJ_Array_Iterator
+{
+	const CJ_Variable *var;
+} CJ_Array_Iterator;
+
+CJ_Array_Iterator *cj_array_iterator_start(CJ_Array *array);
+CJ_Array_Iterator *cj_array_iterator_next(CJ_Array *array, CJ_Array_Iterator *iterator);
+CJ_Array_Iterator *cj_array_iterator_end(CJ_Array *array);
+
+// error
+CM_String cj_get_last_error();
 
 // util
 CJ_Variable *cj_parse(const char *string);
-void cj_fprintf(FILE *file, CJ_Variable *var);
-
-// error
-typedef enum _CJ_ErrorType
-{
-	CJ_ERROR_NONE = 0,
-	CJ_ERROR_UNEXPECTED_TOKEN,
-	CJ_ERROR_UNKNOWN_CONTROL_CHARACTER,
-	CJ_ERROR_VARIABLE_NULL,
-	CJ_ERROR_NOT_INITIALIZED,
-	CJ_ERROR_STRING_NULL
-} CJ_ErrorType;
-typedef void (*cj_error_callback)(uint64_t type, const char *message);
-void cj_error_callback_set(cj_error_callback callback);
-#define CJ_ERROR_PRINT_ENABLED 1
-#define CJ_ERROR_PRINT_DISABLED 0
-void cj_error_callback_print_set(uint32_t should_print);
-
-// validation layer
-
-#ifdef CJ_VALIDATION_LAYER
-
-// variable
-#define cj_variable_copy(variable) _vl_cj_variable_copy(variable, __FILE__, __LINE__)
-#define cj_variable_type(variable) _vl_cj_variable_type(variable, __FILE__, __LINE__)
-#define cj_variable_value(variable) _vl_cj_variable_value(variable, __FILE__, __LINE__)
-#define cj_variable_destroy(variable) _vl_cj_variable_destroy(variable, __FILE__, __LINE__)
-
-// null
-#define cj_null_create() _vl_cj_null_create(__FILE__, __LINE__)
-#define cj_null_destroy() _vl_cj_null_destroy(__FILE__, __LINE__)
-
-// integer
-#define cj_integer_create(value) _vl_cj_integer_create(value, __FILE__, __LINE__)
-#define cj_integer_copy(integer) _vl_cj_integer_copy(integer, __FILE__, __LINE__)
-#define cj_integer_destroy(integer) _vl_cj_integer_destroy(integer, __FILE__, __LINE__)
-
-#define cj_integer_set(integer, value) _vl_cj_integer_set(integer, value, __FILE__, __LINE__)
-#define cj_integer_get(integer) _vl_cj_integer_get(integer, __FILE__, __LINE__)
-
-// float
-#define cj_float_create(value) _vl_cj_float_create(value, __FILE__, __LINE__)
-#define cj_float_copy(_float) _vl_cj_float_copy(_float, __FILE__, __LINE__)
-#define cj_float_destroy(_float) _vl_cj_float_destroy(_float, __FILE__, __LINE__)
-
-#define cj_float_set(_float, value) _vl_cj_float_set(_float, value, __FILE__, __LINE__)
-#define cj_float_get(_float) _vl_cj_float_get(_float, __FILE__, __LINE__)
-
-// bool
-#define cj_bool_create(value) _vl_cj_bool_create(value, __FILE__, __LINE__)
-#define cj_bool_copy(bool) _vl_cj_bool_copy(bool, __FILE__, __LINE__)
-#define cj_bool_destroy(bool) _vl_cj_bool_destroy(bool, __FILE__, __LINE__)
-
-#define cj_bool_set(bool, value) _vl_cj_bool_set(bool, __FILE__, __LINE__)
-#define cj_bool_get(bool) _vl_cj_bool_get(bool, __FILE__, __LINE__)
-
-// string
-#define cj_string_create(value) _vl_cj_string_create(value, __FILE__, __LINE__)
-#define cj_string_copy(string) _vl_cj_string_copy(string, __FILE__, __LINE__)
-#define cj_string_destroy(string) _vl_cj_string_destroy(string, __FILE__, __LINE__)
-
-#define cj_string_set(string, value) _vl_cj_string_set(string, value, __FILE__, __LINE__)
-#define cj_string_get(string) _vl_cj_string_get(string, __FILE__, __LINE__)
-
-// object
-#define cj_object_create() _vl_cj_object_create(__FILE__, __LINE__)
-#define cj_object_copy(object) _vl_cj_object_copy(object, __FILE__, __LINE__)
-#define cj_object_destroy(object) _vl_cj_object_destroy(object, __FILE__, __LINE__)
-#define cj_object_count(object) _vl_cj_object_count(object, __FILE__, __LINE__)
-#define cj_object_attach(object, name, var) _vl_cj_object_attach(object, name, var, __FILE__, __LINE__)
-#define cj_object_detach(object, name) _vl_cj_object_detach(object, name, __FILE__, __LINE__)
-#define cj_object_get(object, name) _vl_cj_object_get(object, name, __FILE__, __LINE__)
-
-// array
-#define cj_array_create() _vl_cj_array_create(__FILE__, __LINE__)
-#define cj_array_copy(array) _vl_cj_array_copy(array, __FILE__, __LINE__)
-#define cj_array_destroy(array) _vl_cj_array_destroy(array, __FILE__, __LINE__)
-#define cj_array_count(array) _vl_cj_array_count(array, __FILE__, __LINE__)
-#define cj_array_attach(array, var) _vl_cj_array_attach(array, var, __FILE__, __LINE__)
-#define cj_array_detach(array, index) _vl_cj_array_detach(array, index, __FILE__, __LINE__)
-#define cj_array_get(array, index) _vl_cj_array_get(array, index, __FILE__, __LINE__)
-
-// util
-#define cj_parse(string) _vl_cj_parse(string, __FILE__, __LINE__)
-#define cj_fprintf(f, var) _vl_cj_fprintf(f, var, __FILE__, __LINE__)
-#define cj_stringify(var) _vl_cj_stringify(var, __FILE__, __LINE__)
-
-#define cj_init() _vl_cj_init(__FILE__, __LINE__)
-#define cj_terminate() _vl_cj_init(__FILE__, __LINE__)
-
-#define cj_error_callback_set(callback) _vl_cj_error_callback_set(callback, __FILE__, __LINE__)
-#define cj_error_callback_print_set(should_print) _vl_cj_error_callback_print_set(should_print, __FILE__, __LINE__)
-
-#include "cj_validation_layer.h"
-
-#endif
+void cj_fprintf(FILE *file, const CJ_Variable *var);
 
 #endif

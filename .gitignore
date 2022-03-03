@@ -1,3 +1,5 @@
+_bin/
+_bin_obj/
+*.sh
 *Makefile*
-*.vcxproj
-*.vcxproj.user
+*.vcxproj*

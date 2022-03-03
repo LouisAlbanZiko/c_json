@@ -1,14 +1,14 @@
 #include "internal.h"
 
-void cj_fprintf_variable(FILE *file, CJ_Variable *var, uint64_t depth);
+void cj_fprintf_variable(FILE *file, const CJ_Variable *var, uint64_t depth);
 
-void cj_fprintf(FILE *file, CJ_Variable *var)
+void cj_fprintf(FILE *file, const CJ_Variable *var)
 {
 	cj_fprintf_variable(file, var, (uint64_t)0);
 	fprintf(file, "\n");
 }
 
-void cj_fprintf_variable(FILE *file, CJ_Variable *var, uint64_t depth)
+void cj_fprintf_variable(FILE *file, const CJ_Variable *var, uint64_t depth)
 {
 	//for(uint64_t i = 0; i < depth; i++)
 	//	fprintf(file, "\t");
@@ -19,7 +19,7 @@ void cj_fprintf_variable(FILE *file, CJ_Variable *var, uint64_t depth)
 		fprintf(file, "null");
 		break;
 	}
-	case CJ_TYPE_INT:
+	case CJ_TYPE_INTEGER:
 	{
 		fprintf(file, "%I64d", cj_integer_get((CJ_Integer *)var));
 		break;
@@ -31,8 +31,8 @@ void cj_fprintf_variable(FILE *file, CJ_Variable *var, uint64_t depth)
 	}
 	case CJ_TYPE_BOOL:
 	{
-		static const char const *_true = "true";
-		static const char const *_false = "false";
+		static const char *const _true = "true";
+		static const char *const _false = "false";
 		uint64_t val = cj_bool_get((CJ_Bool *)var);
 		const char *val_s = (const char *)((uint64_t)_true * val + (uint64_t)_false * !val);
 		fprintf(file, "%s", val_s);
@@ -40,7 +40,7 @@ void cj_fprintf_variable(FILE *file, CJ_Variable *var, uint64_t depth)
 	}
 	case CJ_TYPE_STRING:
 	{
-		const char *val = cj_string_get((CJ_String *)var);
+		const char *val = cj_string_get((CJ_String *)var).data;
 		fprintf(file, "\"%s\"", val);
 		break;
 	}
@@ -51,9 +51,9 @@ void cj_fprintf_variable(FILE *file, CJ_Variable *var, uint64_t depth)
 		for (uint64_t i = 0; i < depth; i++)
 			fprintf(file, "\t");
 		fprintf(file, "{\n");
-		for (CJ_Object_Iterator *iter = cj_object_iterator_start(object); iter != cj_object_iterator_end(object); iter = cj_object_iterator_next(object, iter))
+		for (CJ_Object_Iterator *iter = cj_object_iterator_begin(object); iter != cj_object_iterator_end(object); iter = cj_object_iterator_next(object, iter))
 		{
-			for(uint64_t i = 0; i <= depth; i++)
+			for (uint64_t i = 0; i <= depth; i++)
 				fprintf(file, "\t");
 			fprintf(file, "\"%s\" : ", iter->name);
 			cj_fprintf_variable(file, iter->var, depth + 1);

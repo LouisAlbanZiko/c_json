@@ -2,9 +2,11 @@
 
 CJ_Variable *cj_variable_copy(CJ_Variable *variable)
 {
-	switch(variable->type)
+	switch (variable->type)
 	{
-	case CJ_TYPE_INT:
+	case CJ_TYPE_NULL:
+		return (CJ_Variable *)cj_null_create();
+	case CJ_TYPE_INTEGER:
 		return (CJ_Variable *)cj_integer_copy((CJ_Integer *)variable);
 	case CJ_TYPE_FLOAT:
 		return (CJ_Variable *)cj_float_copy((CJ_Float *)variable);
@@ -26,16 +28,14 @@ uint64_t cj_variable_type(CJ_Variable *variable)
 	return variable->type;
 }
 
-/*uint64_t cj_variable_value(CJ_Variable *variable)
-{
-	return variable->value;
-}*/
-
 void cj_variable_destroy(CJ_Variable *variable)
 {
-	switch(variable->type)
+	switch (variable->type)
 	{
-	case CJ_TYPE_INT:
+	case CJ_TYPE_NULL:
+		cj_null_destroy((CJ_Null *)variable);
+		return;
+	case CJ_TYPE_INTEGER:
 		cj_integer_destroy((CJ_Integer *)variable);
 		return;
 	case CJ_TYPE_FLOAT:
@@ -54,14 +54,4 @@ void cj_variable_destroy(CJ_Variable *variable)
 		cj_array_destroy((CJ_Array *)variable);
 		return;
 	}
-}
-
-CJ_Variable *_cj_variable_alloc()
-{
-	return (CJ_Variable *)cm_heap_alloc(g_cj_heap_variable, sizeof(CJ_Variable));
-}
-
-void _cj_variable_free(CJ_Variable *var)
-{
-	cm_heap_free(g_cj_heap_variable, var);
 }

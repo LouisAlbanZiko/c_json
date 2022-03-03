@@ -1,5 +1,7 @@
 #include "internal.h"
 
+#include <setjmp.h>
+
 typedef struct _CJ_ParseData
 {
 	const char *start;
@@ -30,12 +32,12 @@ uint32_t cj_parse_strcmp(const char *s1, const char *s2);
 CJ_Variable *cj_parse(const char *string)
 {
 	CJ_ParseData parse_data =
-		{
-			.start = string,
-			.current = string,
-			.end = string + strlen(string),
-			.line = 1,
-			.character_in_line = 0};
+	{
+		.start = string,
+		.current = string,
+		.end = string + strlen(string),
+		.line = 1,
+		.character_in_line = 0 };
 
 	CJ_Variable *variable = NULL;
 	if (!setjmp(parse_data.ex_buf))
@@ -133,7 +135,7 @@ CJ_Variable *cj_parse_string(CJ_ParseData *parse_data)
 {
 	cj_parse_character(parse_data);
 
-	CM_StringBuffer *string_buffer = cm_string_buffer_create_with_size(128);
+	CM_StringBuffer *string_buffer = cm_string_buffer_create(128);
 	while (C != '"')
 	{
 		char insert_char = C;
@@ -179,11 +181,9 @@ CJ_Variable *cj_parse_string(CJ_ParseData *parse_data)
 	}
 	cj_parse_character(parse_data);
 
-	const char *string = cm_string_buffer_data(string_buffer);
-	
-	CJ_String *cj_str = cj_string_create(string);
+	CM_String string = cm_string_buffer_to_string_and_destroy(string_buffer);
 
-	cm_string_buffer_destroy(string_buffer);
+	CJ_String *cj_str = cj_string_create(string);
 
 	return (CJ_Variable *)cj_str;
 }
@@ -224,7 +224,7 @@ CJ_Variable *cj_parse_number(CJ_ParseData *parse_data)
 	{
 		exponent = 0;
 		cj_parse_character(parse_data);
-		if(C == '-' || C == '+')
+		if (C == '-' || C == '+')
 		{
 			exponent_sign = (C == '-') * (-1) + (C == '+') * 1;
 			cj_parse_character(parse_data);
@@ -236,13 +236,13 @@ CJ_Variable *cj_parse_number(CJ_ParseData *parse_data)
 			cj_parse_character(parse_data);
 		}
 	}
-	if(mantis_divisor == 1)
+	if (mantis_divisor == 1)
 	{
 		return (CJ_Variable *)cj_integer_create(sign * (int64_t)pow((double)nr, (double)exponent_sign * (double)exponent));
 	}
 	else
 	{
-		return (CJ_Variable *) cj_float_create((double)sign * pow((double) nr + (double) mantis / (double) mantis_divisor, (double)exponent * (double)exponent_sign));
+		return (CJ_Variable *)cj_float_create((double)sign * pow((double)nr + (double)mantis / (double)mantis_divisor, (double)exponent * (double)exponent_sign));
 	}
 }
 
@@ -272,7 +272,7 @@ CJ_Variable *cj_parse_object(CJ_ParseData *parse_data)
 		cj_parse_whitespace(parse_data);
 
 		CJ_Variable *var = cj_parse_value(parse_data);
-		cj_object_attach(object, name->value, var);
+		cj_object_attach(object, cj_string_get(name), var);
 
 		cj_parse_whitespace(parse_data);
 		if (C == ',')
