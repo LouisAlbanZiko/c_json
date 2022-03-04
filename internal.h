@@ -59,16 +59,6 @@ typedef struct _CJ_Array
 } _CJ_Array;
 
 // error
-typedef enum _CJ_ErrorType
-{
-	CJ_ERROR_NONE = 0,
-	CJ_ERROR_UNEXPECTED_TOKEN,
-	CJ_ERROR_UNKNOWN_CONTROL_CHARACTER,
-	CJ_ERROR_VARIABLE_NULL,
-	CJ_ERROR_NOT_INITIALIZED,
-	CJ_ERROR_STRING_NULL
-} CJ_ErrorType;
-
 void _cj_make_error(uint64_t error_type, const char *format, ...);
 
 #endif

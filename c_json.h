@@ -154,7 +154,22 @@ CJ_Array_Iterator *cj_array_iterator_next(CJ_Array *array, CJ_Array_Iterator *it
 CJ_Array_Iterator *cj_array_iterator_end(CJ_Array *array);
 
 // error
-CM_String cj_get_last_error();
+typedef struct CJ_Error
+{
+	uint64_t error_type;
+	CM_String message;
+} CJ_Error;
+CJ_Error cj_get_last_error();
+
+typedef enum _CJ_ErrorType
+{
+	CJ_ERROR_NONE = 0,
+	CJ_ERROR_UNEXPECTED_TOKEN,
+	CJ_ERROR_UNKNOWN_CONTROL_CHARACTER,
+	CJ_ERROR_VARIABLE_NULL,
+	CJ_ERROR_NOT_INITIALIZED,
+	CJ_ERROR_STRING_NULL
+} CJ_ErrorType;
 
 // util
 CJ_Variable *cj_parse(const char *string);
