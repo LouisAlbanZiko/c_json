@@ -18,7 +18,7 @@ typedef enum CJ_VariableType
 	CJ_TYPE_STRING,
 	CJ_TYPE_OBJECT,
 	CJ_TYPE_ARRAY,
-	CJ_TYPE_COUNT
+	_CJ_TYPE_COUNT
 } CJ_VariableType;
 
 typedef struct CJ_Variable
