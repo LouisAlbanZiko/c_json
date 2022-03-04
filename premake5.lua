@@ -10,3 +10,7 @@ project "c_json"
 
 	filter "configurations:Debug"
 		defines "CM_DEBUG"
+
+	filter "system:linux"
+		links { "m" }
+		buildoptions "-g"
