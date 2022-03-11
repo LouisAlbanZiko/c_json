@@ -41,21 +41,21 @@ typedef struct _CJ_Bool
 typedef struct _CJ_String
 {
 	uint64_t type;
-	CM_String value;
+	CC_String value;
 } _CJ_String;
 
 // object
 typedef struct _CJ_Object
 {
 	uint64_t type;
-	CM_HashMap *map;
+	CC_HashMap *map;
 } _CJ_Object;
 
 // array
 typedef struct _CJ_Array
 {
 	uint64_t type;
-	CM_UnorderedSet *set;
+	CC_UnorderedSet *set;
 } _CJ_Array;
 
 // error

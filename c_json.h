@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include <c_mem/c_mem.h>
+#include <c_core/c_core.h>
 
 typedef enum CJ_VariableType
 {
@@ -95,12 +95,12 @@ typedef struct CJ_String
 	const uint64_t length;
 } CJ_String;
 
-CJ_String *cj_string_create(CM_String value);
+CJ_String *cj_string_create(CC_String value);
 CJ_String *cj_string_copy(CJ_String *var);
 void cj_string_destroy(CJ_String *var);
 
-void cj_string_set(CJ_String *string, CM_String value);
-CM_String cj_string_get(CJ_String *string);
+void cj_string_set(CJ_String *string, CC_String value);
+CC_String cj_string_get(CJ_String *string);
 
 // object
 typedef struct CJ_Object
@@ -113,9 +113,9 @@ CJ_Object *cj_object_copy(CJ_Object *var);
 void cj_object_destroy(CJ_Object *var);
 
 uint64_t cj_object_count(CJ_Object *var);
-void cj_object_attach(CJ_Object *object, CM_String name, CJ_Variable *var);
-CJ_Variable *cj_object_detach(CJ_Object *object, CM_String name);
-CJ_Variable *cj_object_get(CJ_Object *object, CM_String name);
+void cj_object_attach(CJ_Object *object, CC_String name, CJ_Variable *var);
+CJ_Variable *cj_object_detach(CJ_Object *object, CC_String name);
+CJ_Variable *cj_object_get(CJ_Object *object, CC_String name);
 
 typedef struct CJ_Object_Iterator
 {
@@ -157,7 +157,7 @@ CJ_Array_Iterator *cj_array_iterator_end(CJ_Array *array);
 typedef struct CJ_Error
 {
 	uint64_t error_type;
-	CM_String message;
+	CC_String message;
 } CJ_Error;
 CJ_Error cj_get_last_error();
 
