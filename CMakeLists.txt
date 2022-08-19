@@ -10,5 +10,8 @@ if( CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR )
 	add_subdirectory(test)
 endif()
 
-add_subdirectory(_vendor/c_core)
+if( C_JSON_INCLUDE_DEPENDENCIES )
+	add_subdirectory(_vendor/c_core)
+endif()
+
 add_subdirectory(src)
