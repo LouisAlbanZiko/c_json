@@ -1,7 +1,7 @@
 #ifndef _C_JSON_INTERNAL_H_
 #define _C_JSON_INTERNAL_H_
 
-#include "c_json.h"
+#include <c_json/c_json.h>
 
 typedef struct _CJ_Variable
 {
@@ -41,14 +41,14 @@ typedef struct _CJ_Bool
 typedef struct _CJ_String
 {
 	uint64_t type;
-	CC_String value;
+	char *value;
 } _CJ_String;
 
 // object
 typedef struct _CJ_Object
 {
 	uint64_t type;
-	CC_HashMap *map;
+	CC_HashMapString *map;
 } _CJ_Object;
 
 // array
@@ -59,6 +59,6 @@ typedef struct _CJ_Array
 } _CJ_Array;
 
 // error
-void _cj_make_error(uint64_t error_type, const char *format, ...);
+void _CJ_Make_Error(uint64_t error_type, const char *format, ...);
 
 #endif

@@ -14,22 +14,22 @@ typedef struct _CJ_ParseData
 
 #define CJ_MAKE_PARSE_ERROR(type, ...)     \
 	{                                      \
-		_cj_make_error(type, __VA_ARGS__); \
+		_CJ_Make_Error(type, __VA_ARGS__); \
 		longjmp(parse_data->ex_buf, 1);    \
 	}
 
 #define C (parse_data->current[0])
 
-void cj_parse_character(CJ_ParseData *parse_data);
-void cj_parse_whitespace(CJ_ParseData *parse_data);
-CJ_Variable *cj_parse_value(CJ_ParseData *parse_data);
-CJ_Variable *cj_parse_string(CJ_ParseData *parse_data);
-CJ_Variable *cj_parse_number(CJ_ParseData *parse_data);
-CJ_Variable *cj_parse_object(CJ_ParseData *parse_data);
-CJ_Variable *cj_parse_array(CJ_ParseData *parse_data);
-uint32_t cj_parse_strccp(const char *s1, const char *s2);
+void CJ_Parse_Character(CJ_ParseData *parse_data);
+void CJ_Parse_Whitespace(CJ_ParseData *parse_data);
+CJ_Variable *CJ_Parse_Value(CJ_ParseData *parse_data);
+CJ_Variable *CJ_Parse_String(CJ_ParseData *parse_data);
+CJ_Variable *CJ_Parse_Number(CJ_ParseData *parse_data);
+CJ_Variable *CJ_Parse_Object(CJ_ParseData *parse_data);
+CJ_Variable *CJ_Parse_Array(CJ_ParseData *parse_data);
+uint32_t CJ_Parse_Strccp(const char *s1, const char *s2);
 
-CJ_Variable *cj_parse(const char *string)
+CJ_Variable *CJ_Parse(const char *string)
 {
 	CJ_ParseData parse_data =
 	{
@@ -42,18 +42,18 @@ CJ_Variable *cj_parse(const char *string)
 	CJ_Variable *variable = NULL;
 	if (!setjmp(parse_data.ex_buf))
 	{
-		variable = cj_parse_value(&parse_data);
+		variable = CJ_Parse_Value(&parse_data);
 		return variable;
 	}
 	else
 	{
 		if (variable != NULL)
-			cj_variable_destroy(variable);
+			CJ_Variable_Destroy(variable);
 		return NULL;
 	}
 }
 
-void cj_parse_character(CJ_ParseData *parse_data)
+void CJ_Parse_Character(CJ_ParseData *parse_data)
 {
 	uint32_t is_new_line = C == '\n';
 	parse_data->line += is_new_line;
@@ -61,45 +61,45 @@ void cj_parse_character(CJ_ParseData *parse_data)
 	parse_data->current++;
 }
 
-void cj_parse_whitespace(CJ_ParseData *parse_data)
+void CJ_Parse_Whitespace(CJ_ParseData *parse_data)
 {
 	while (C == ' ' || C == '\t' || C == '\n' || C == '\r')
-		cj_parse_character(parse_data);
+		CJ_Parse_Character(parse_data);
 }
 
-CJ_Variable *cj_parse_value(CJ_ParseData *parse_data)
+CJ_Variable *CJ_Parse_Value(CJ_ParseData *parse_data)
 {
 	CJ_Variable *variable = NULL;
 
-	cj_parse_whitespace(parse_data);
+	CJ_Parse_Whitespace(parse_data);
 
 	if (C == '"')
 	{
-		variable = cj_parse_string(parse_data);
+		variable = CJ_Parse_String(parse_data);
 	}
 	else if (C == '{')
 	{
-		variable = cj_parse_object(parse_data);
+		variable = CJ_Parse_Object(parse_data);
 	}
 	else if (C == '[')
 	{
-		variable = cj_parse_array(parse_data);
+		variable = CJ_Parse_Array(parse_data);
 	}
 	else if (C == 't' || C == 'f')
 	{
-		uint32_t _true = cj_parse_strccp("true", &C);
-		uint32_t _false = cj_parse_strccp("false", &C);
+		uint32_t _true = CJ_Parse_Strccp("true", &C);
+		uint32_t _false = CJ_Parse_Strccp("false", &C);
 		if (_true)
 		{
 			for (uint32_t i = 0; i < 4; i++)
-				cj_parse_character(parse_data);
-			variable = (CJ_Variable *)cj_bool_create((uint64_t)1);
+				CJ_Parse_Character(parse_data);
+			variable = (CJ_Variable *)CJ_Bool_Create((uint64_t)1);
 		}
 		else if (_false)
 		{
 			for (uint32_t i = 0; i < 5; i++)
-				cj_parse_character(parse_data);
-			variable = (CJ_Variable *)cj_bool_create((uint64_t)0);
+				CJ_Parse_Character(parse_data);
+			variable = (CJ_Variable *)CJ_Bool_Create((uint64_t)0);
 		}
 		else
 		{
@@ -108,11 +108,11 @@ CJ_Variable *cj_parse_value(CJ_ParseData *parse_data)
 	}
 	else if (C == 'n')
 	{
-		if (cj_parse_strccp("null", &C))
+		if (CJ_Parse_Strccp("null", &C))
 		{
 			for (uint32_t i = 0; i < 4; i++)
-				cj_parse_character(parse_data);
-			variable = (CJ_Variable *)cj_null_create();
+				CJ_Parse_Character(parse_data);
+			variable = (CJ_Variable *)CJ_Null_Create();
 		}
 		else
 		{
@@ -121,7 +121,7 @@ CJ_Variable *cj_parse_value(CJ_ParseData *parse_data)
 	}
 	else if ((C >= '0' && C <= '9') || C == '-')
 	{
-		variable = cj_parse_number(parse_data);
+		variable = CJ_Parse_Number(parse_data);
 	}
 	else
 	{
@@ -131,17 +131,17 @@ CJ_Variable *cj_parse_value(CJ_ParseData *parse_data)
 	return variable;
 }
 
-CJ_Variable *cj_parse_string(CJ_ParseData *parse_data)
+CJ_Variable *CJ_Parse_String(CJ_ParseData *parse_data)
 {
-	cj_parse_character(parse_data);
+	CJ_Parse_Character(parse_data);
 
-	CC_StringBuffer *string_buffer = cc_string_buffer_create(128);
+	CC_StringBuffer *string_buffer = CC_StringBuffer_Create(128);
 	while (C != '"')
 	{
 		char insert_char = C;
 		if (C == '\\')
 		{
-			cj_parse_character(parse_data);
+			CJ_Parse_Character(parse_data);
 			insert_char = C;
 			switch (C)
 			{
@@ -168,7 +168,7 @@ CJ_Variable *cj_parse_string(CJ_ParseData *parse_data)
 			case 'u':
 				insert_char = ' ';
 				for (uint32_t i = 0; i < 4; i++)
-					cj_parse_character(parse_data);
+					CJ_Parse_Character(parse_data);
 				CJ_MAKE_PARSE_ERROR(CJ_ERROR_NONE, "Unicode isn't supported yet.");
 				break;
 			default:
@@ -176,19 +176,19 @@ CJ_Variable *cj_parse_string(CJ_ParseData *parse_data)
 				break;
 			}
 		}
-		cc_string_buffer_insert_char(string_buffer, insert_char);
-		cj_parse_character(parse_data);
+		CC_StringBuffer_InsertChar(string_buffer, insert_char);
+		CJ_Parse_Character(parse_data);
 	}
-	cj_parse_character(parse_data);
+	CJ_Parse_Character(parse_data);
 
-	CC_String string = cc_string_buffer_to_string_and_destroy(string_buffer);
+	const char * string = CC_StringBuffer_ToStringAndDestroy(string_buffer, NULL);
 
-	CJ_String *cj_str = cj_string_create(string);
+	CJ_String *cj_str = CJ_String_Create(string);
 
 	return (CJ_Variable *)cj_str;
 }
 
-CJ_Variable *cj_parse_number(CJ_ParseData *parse_data)
+CJ_Variable *CJ_Parse_Number(CJ_ParseData *parse_data)
 {
 
 	int64_t sign = 1;
@@ -201,84 +201,84 @@ CJ_Variable *cj_parse_number(CJ_ParseData *parse_data)
 	if (C == '-' || C == '+')
 	{
 		sign = (C == '-') * (-1) + (C == '+') * 1;
-		cj_parse_character(parse_data);
+		CJ_Parse_Character(parse_data);
 	}
 	while (C >= '0' && C <= '9')
 	{
 		nr *= 10;
 		nr += C - '0';
-		cj_parse_character(parse_data);
+		CJ_Parse_Character(parse_data);
 	}
 	if (C == '.')
 	{
-		cj_parse_character(parse_data);
+		CJ_Parse_Character(parse_data);
 		while (C >= '0' && C <= '9')
 		{
 			mantis *= 10;
 			mantis_divisor *= 10;
 			mantis += C - '0';
-			cj_parse_character(parse_data);
+			CJ_Parse_Character(parse_data);
 		}
 	}
 	if (C == 'e' || C == 'E')
 	{
 		exponent = 0;
-		cj_parse_character(parse_data);
+		CJ_Parse_Character(parse_data);
 		if (C == '-' || C == '+')
 		{
 			exponent_sign = (C == '-') * (-1) + (C == '+') * 1;
-			cj_parse_character(parse_data);
+			CJ_Parse_Character(parse_data);
 		}
 		while (C >= '0' && C <= '9')
 		{
 			exponent *= 10;
 			exponent += C - '0';
-			cj_parse_character(parse_data);
+			CJ_Parse_Character(parse_data);
 		}
 	}
 	if (mantis_divisor == 1)
 	{
-		return (CJ_Variable *)cj_integer_create(sign * (int64_t)pow((double)nr, (double)exponent_sign * (double)exponent));
+		return (CJ_Variable *)CJ_Integer_Create(sign * (int64_t)pow((double)nr, (double)exponent_sign * (double)exponent));
 	}
 	else
 	{
-		return (CJ_Variable *)cj_float_create((double)sign * pow((double)nr + (double)mantis / (double)mantis_divisor, (double)exponent * (double)exponent_sign));
+		return (CJ_Variable *)CJ_Float_Create((double)sign * pow((double)nr + (double)mantis / (double)mantis_divisor, (double)exponent * (double)exponent_sign));
 	}
 }
 
-CJ_Variable *cj_parse_object(CJ_ParseData *parse_data)
+CJ_Variable *CJ_Parse_Object(CJ_ParseData *parse_data)
 {
-	CJ_Object *object = cj_object_create();
+	CJ_Object *object = CJ_Object_Create();
 
-	cj_parse_character(parse_data);
-	cj_parse_whitespace(parse_data);
+	CJ_Parse_Character(parse_data);
+	CJ_Parse_Whitespace(parse_data);
 	uint32_t i = 0;
 	while (C == '"')
 	{
 		i++;
 		// parse name
-		CJ_String *name = (CJ_String *)cj_parse_string(parse_data);
+		CJ_String *name = (CJ_String *)CJ_Parse_String(parse_data);
 		if (name == NULL)
 		{
 			CJ_MAKE_PARSE_ERROR(CJ_ERROR_UNEXPECTED_TOKEN, "Unexpected character while parsing cj_object '%c' on line %d, character %d.", C, parse_data->line, parse_data->character_in_line);
 		}
 
-		cj_parse_character(parse_data);
-		cj_parse_whitespace(parse_data);
+		CJ_Parse_Character(parse_data);
+		CJ_Parse_Whitespace(parse_data);
 		if (C == ':')
 		{
-			cj_parse_character(parse_data);
+			CJ_Parse_Character(parse_data);
 		}
-		cj_parse_whitespace(parse_data);
+		CJ_Parse_Whitespace(parse_data);
 
-		CJ_Variable *var = cj_parse_value(parse_data);
-		cj_object_attach(object, cj_string_get(name), var);
+		CJ_Variable *var = CJ_Parse_Value(parse_data);
+		CJ_Object_Attach(object, CJ_String_Get(name), var);
 
-		cj_parse_whitespace(parse_data);
+		CJ_Parse_Whitespace(parse_data);
 		if (C == ',')
 		{
-			cj_parse_character(parse_data);
-			cj_parse_whitespace(parse_data);
+			CJ_Parse_Character(parse_data);
+			CJ_Parse_Whitespace(parse_data);
 		}
 		else if (C == '}')
 		{
@@ -290,29 +290,29 @@ CJ_Variable *cj_parse_object(CJ_ParseData *parse_data)
 		}
 	}
 
-	cj_parse_character(parse_data);
+	CJ_Parse_Character(parse_data);
 
 	return (CJ_Variable *)object;
 }
 
-CJ_Variable *cj_parse_array(CJ_ParseData *parse_data)
+CJ_Variable *CJ_Parse_Array(CJ_ParseData *parse_data)
 {
-	CJ_Array *array = cj_array_create();
+	CJ_Array *array = CJ_Array_Create();
 
-	cj_parse_character(parse_data);
-	cj_parse_whitespace(parse_data);
+	CJ_Parse_Character(parse_data);
+	CJ_Parse_Whitespace(parse_data);
 	if (C != ']')
 	{
 		while (1)
 		{
-			CJ_Variable *var = cj_parse_value(parse_data);
-			cj_array_attach(array, var);
+			CJ_Variable *var = CJ_Parse_Value(parse_data);
+			CJ_Array_Attach(array, var);
 
-			cj_parse_whitespace(parse_data);
+			CJ_Parse_Whitespace(parse_data);
 			if (C == ',')
 			{
-				cj_parse_character(parse_data);
-				cj_parse_whitespace(parse_data);
+				CJ_Parse_Character(parse_data);
+				CJ_Parse_Whitespace(parse_data);
 			}
 			else if (C == ']')
 			{
@@ -325,12 +325,12 @@ CJ_Variable *cj_parse_array(CJ_ParseData *parse_data)
 		}
 	}
 
-	cj_parse_character(parse_data);
+	CJ_Parse_Character(parse_data);
 
 	return (CJ_Variable *)array;
 }
 
-uint32_t cj_parse_strccp(const char *s1, const char *s2)
+uint32_t CJ_Parse_Strccp(const char *s1, const char *s2)
 {
 	uint64_t length = strlen(s1);
 	uint64_t i;

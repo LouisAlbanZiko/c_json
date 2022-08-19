@@ -1,14 +1,14 @@
 #include "internal.h"
 
-void cj_fprintf_variable(FILE *file, const CJ_Variable *var, uint64_t depth);
+void CJ_Fprintf_Variable(FILE *file, const CJ_Variable *var, uint64_t depth);
 
-void cj_fprintf(FILE *file, const CJ_Variable *var)
+void CJ_fprintf(FILE *file, const CJ_Variable *var)
 {
-	cj_fprintf_variable(file, var, (uint64_t)0);
+	CJ_Fprintf_Variable(file, var, (uint64_t)0);
 	fprintf(file, "\n");
 }
 
-void cj_fprintf_variable(FILE *file, const CJ_Variable *var, uint64_t depth)
+void CJ_Fprintf_Variable(FILE *file, const CJ_Variable *var, uint64_t depth)
 {
 	//for(uint64_t i = 0; i < depth; i++)
 	//	fprintf(file, "\t");
@@ -21,26 +21,26 @@ void cj_fprintf_variable(FILE *file, const CJ_Variable *var, uint64_t depth)
 	}
 	case CJ_TYPE_INTEGER:
 	{
-		fprintf(file, "%I64d", cj_integer_get((CJ_Integer *)var));
+		fprintf(file, "%lld", CJ_Integer_Get((CJ_Integer *)var));
 		break;
 	}
 	case CJ_TYPE_FLOAT:
 	{
-		fprintf(file, "%lf", cj_float_get((CJ_Float *)var));
+		fprintf(file, "%lf", CJ_Float_Get((CJ_Float *)var));
 		break;
 	}
 	case CJ_TYPE_BOOL:
 	{
 		static const char *const _true = "true";
 		static const char *const _false = "false";
-		uint64_t val = cj_bool_get((CJ_Bool *)var);
+		uint64_t val = CJ_Bool_Get((CJ_Bool *)var);
 		const char *val_s = (const char *)((uint64_t)_true * val + (uint64_t)_false * !val);
 		fprintf(file, "%s", val_s);
 		break;
 	}
 	case CJ_TYPE_STRING:
 	{
-		const char *val = cj_string_get((CJ_String *)var).data;
+		const char *val = CJ_String_Get((CJ_String *)var);
 		fprintf(file, "\"%s\"", val);
 		break;
 	}
@@ -51,13 +51,13 @@ void cj_fprintf_variable(FILE *file, const CJ_Variable *var, uint64_t depth)
 		for (uint64_t i = 0; i < depth; i++)
 			fprintf(file, "\t");
 		fprintf(file, "{\n");
-		for (CJ_Object_Iterator *iter = cj_object_iterator_begin(object); iter != cj_object_iterator_end(object); iter = cj_object_iterator_next(object, iter))
+		for (CJ_Object_Iterator *iter = CJ_Object_IteratorBegin(object); iter != CJ_Object_IteratorEnd(object); iter = CJ_Object_IteratorNext(object, iter))
 		{
 			for (uint64_t i = 0; i <= depth; i++)
 				fprintf(file, "\t");
 			fprintf(file, "\"%s\" : ", iter->name);
-			cj_fprintf_variable(file, iter->var, depth + 1);
-			if (cj_object_iterator_next(object, iter) != cj_object_iterator_end(object))
+			CJ_Fprintf_Variable(file, iter->var, depth + 1);
+			if (CJ_Object_IteratorNext(object, iter) != CJ_Object_IteratorEnd(object))
 			{
 				fprintf(file, ",\n");
 			}
@@ -75,12 +75,12 @@ void cj_fprintf_variable(FILE *file, const CJ_Variable *var, uint64_t depth)
 		for (uint64_t i = 0; i < depth; i++)
 			fprintf(file, "\t");
 		fprintf(file, "[\n");
-		for (CJ_Array_Iterator *iter = cj_array_iterator_start(array); iter != cj_array_iterator_end(array); iter = cj_array_iterator_next(array, iter))
+		for (CJ_Array_Iterator *iter = CJ_Array_IteratorStart(array); iter != CJ_Array_IteratorEnd(array); iter = CJ_Array_IteratorNext(array, iter))
 		{
 			for (uint64_t i = 0; i <= depth; i++)
 				fprintf(file, "\t");
-			cj_fprintf_variable(file, iter->var, depth + 1);
-			if (cj_array_iterator_next(array, iter) != cj_array_iterator_end(array))
+			CJ_Fprintf_Variable(file, iter->var, depth + 1);
+			if (CJ_Array_IteratorNext(array, iter) != CJ_Array_IteratorEnd(array))
 			{
 				fprintf(file, ",\n");
 			}
